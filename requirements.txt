@@ -1,0 +1,4 @@
+dnspython
+flask
+gunicorn
+pyTelegramBotApi == 3.7.2
