@@ -1,4 +1,4 @@
-from run_server import db
+from database import db
 
 
 class Location(db.Model):
