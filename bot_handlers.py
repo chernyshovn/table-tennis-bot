@@ -29,27 +29,23 @@ def handle_start_single_match_command(message):
     if tournament_repository.has_active(user_id):
         print('У вас есть незавершенная игра!')
     else:
-        msg = bot.send_message(message.chat.id, 'Выберете локацию!')
-        bot.register_next_step_handler(msg, select_location)
-
-
-def select_location(message):
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    for location in location_repository.list_all():
-        markup.add(
-            types.InlineKeyboardButton(
-                location.name,
-                callback_data=f'Location_{location.id}'
+        markup = types.InlineKeyboardMarkup(row_width=1)
+        for location in location_repository.list_all():
+            markup.add(
+                types.InlineKeyboardButton(
+                    location.name,
+                    callback_data=f'Location_{location.id}'
+                )
             )
-        )
-    bot.send_message(message.chat.id, 'Выберете локацию:', reply_markup=markup)
+        bot.send_message(message.chat.id, 'Выберете локацию:', reply_markup=markup)
 
 
 @bot.callback_query_handler(lambda query: query.data.startswith('Location_'))
 def process_top_command_callback(query):
     location_id = int(query.data[len('Location_'):])
+    location_name = location_repository.get_name_by_id(location_id)
     bot.delete_message(query.message.chat.id, query.message.message_id)
-    bot.send_message(query.message.chat.id, f'Location ID: {location_id}')
+    bot.send_message(query.message.chat.id, f'Вы выбрали локацию «{location_name}»!')
 
 
 @bot.message_handler(command=['finish'])
