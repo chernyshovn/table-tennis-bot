@@ -23,20 +23,16 @@ def handle_status_command(message):
     bot.send_sticker(message.chat.id, sticker_id)
 
 
-@bot.message_handler(command=['start_single_match'])
+@bot.message_handler(commands=['start_single_match'])
 def handle_start_single_match_command(message):
-    print(1)
     user_id = message.chat.id
     if tournament_repository.has_active(user_id):
-        print(2)
         print('У вас есть незавершенная игра!')
     else:
-        print(3)
         bot.register_next_step_handler('Выберете локацию!', select_location)
 
 
 def select_location(message):
-    print(4)
     markup = types.InlineKeyboardMarkup(row_width=1)
     for location in location_repository.list_all():
         markup.add(
