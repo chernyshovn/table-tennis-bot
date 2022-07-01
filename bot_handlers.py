@@ -99,7 +99,7 @@ def process_add_player_callback(query):
 @bot.message_handler(commands=['finish_match'])
 def handle_finish_command(message):
     user_id = message.chat.id
-    tournament_id = tournament_repository.get_active_id()
+    tournament_id = tournament_repository.get_active_id(user_id)
 
     if not tournament_id:
         bot.send_message(user_id, 'У вас нет незавершенных матчей!')
