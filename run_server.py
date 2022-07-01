@@ -1,19 +1,16 @@
 import os
 import flask
 from telebot import types
+from app import app
 from bot_handlers import bot
 from database.database import db
 from config import APP_SECRET, APP_NAME, DB_CONNECTION_STRING, TELEGRAM_BOT_TOKEN
-
-
-app = flask.Flask(__name__)
 
 app.config['SECRET_KEY'] = APP_SECRET
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_CONNECTION_STRING
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
-app.app_context().push()
 
 
 @app.route('/' + TELEGRAM_BOT_TOKEN, methods=['POST'])
