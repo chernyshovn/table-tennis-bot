@@ -1,3 +1,4 @@
+import re
 import random
 import static.sticker_ids as sticker_ids
 from bot import bot
@@ -55,27 +56,35 @@ def process_add_location_callback(query):
 
 
 def select_player(chat_id: int, player_number: int):
-    markup = types.InlineKeyboardMarkup(row_width=2)
-    for player in player_repository.list_all():
-        markup.add(
-            types.InlineKeyboardButton(
-                player.name,
-                callback_data=f'Player_{player.id}'
+    if player_number <= 2:
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        for player in player_repository.list_all():
+            markup.add(
+                types.InlineKeyboardButton(
+                    player.name,
+                    callback_data=f'Player_{player.id}_{player_number}'
+                )
             )
-        )
-    bot.send_message(chat_id, f'Выберете игрока №{player_number}:', reply_markup=markup)
+        bot.send_message(chat_id, f'Выберете игрока №{player_number}:', reply_markup=markup)
+    else:
+        bot.send_message(chat_id, 'TODO: Начать игру!')
 
 
 @bot.callback_query_handler(lambda query: query.data.startswith('Player_'))
 def process_add_player_callback(query):
     chat_id = query.message.chat.id
-    player_id = int(query.data[len('Player_'):])
+
+    pattern = re.compile(r"Player_(\d+)_(\d+)")
+    match = pattern.search(query.data)
+    player_id = int(match.group(1))
+    player_number = int(match.group(2))
+
     player_name = player_repository.get_name_by_id(player_id)
     bot.delete_message(chat_id, query.message.message_id)
     # todo: add to repo
-    bot.send_message(chat_id, f'Игрок №1: «{player_name}»!')
+    bot.send_message(chat_id, f'Игрок №{player_number}: «{player_name}»!')
 
-    select_player(chat_id, 2)
+    select_player(chat_id, player_number + 1)
 
 
 @bot.message_handler(command=['finish'])
