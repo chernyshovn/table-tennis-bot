@@ -2,7 +2,7 @@ import random
 import static.sticker_ids as sticker_ids
 from bot import bot
 from telebot import types
-from database.database import db
+from database.database1 import db
 from repositories.tournament_repository import TournamentRepository
 from repositories.location_repository import LocationRepository
 

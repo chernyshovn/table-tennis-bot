@@ -1,4 +1,4 @@
-from database import db
+from database1 import db
 
 
 class Location(db.Model):
