@@ -2,6 +2,7 @@ import os
 import flask
 from telebot import types
 from bot_handlers import bot
+from database.database import db
 from config import APP_SECRET, APP_NAME, DB_CONNECTION_STRING, TELEGRAM_BOT_TOKEN
 
 
@@ -10,6 +11,8 @@ server = flask.Flask(__name__)
 server.config['SECRET_KEY'] = APP_SECRET
 server.config['SQLALCHEMY_DATABASE_URI'] = DB_CONNECTION_STRING
 server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.app = server
 
 
 @server.route('/' + TELEGRAM_BOT_TOKEN, methods=['POST'])
