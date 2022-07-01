@@ -18,6 +18,11 @@ class TournamentRepository:
             entity = Tournament.query.filter_by(initiator_telegram_user_id=telegram_user_id, end_date_time=None).first()
             return entity.id if entity else None
 
+    def set_end_date_time(self, id: int):
+        entity = Tournament.query.filter_by(id=id).first()
+        entity.end_date_time = datetime.utcnow()
+        self.__db.session.commit()
+
     def create(self, location_id: int, initiator_telegram_user_id: int) -> None:
         with app.app_context():
             entity = Tournament(
@@ -28,4 +33,3 @@ class TournamentRepository:
 
             self.__db.session.add(entity)
             self.__db.session.commit()
-

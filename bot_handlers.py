@@ -73,7 +73,7 @@ def select_player(chat_id: int, player_number: int):
             )
         bot.send_message(chat_id, f'Выберете игрока №{player_number}:', reply_markup=markup)
     else:
-        bot.send_message(chat_id, 'TODO: Начать игру!')
+        bot.send_message(chat_id, 'TODO: Начать игру /finish_match!')
 
 
 @bot.callback_query_handler(lambda query: query.data.startswith('Player_'))
@@ -96,10 +96,14 @@ def process_add_player_callback(query):
     select_player(chat_id, player_number + 1)
 
 
-@bot.message_handler(command=['finish'])
+@bot.message_handler(commands=['finish_match'])
 def handle_finish_command(message):
     user_id = message.chat.id
-    if tournament_repository.has_active(user_id):
-        pass
+    tournament_id = tournament_repository.get_active_id()
+
+    if not tournament_id:
+        bot.send_message(user_id, 'У вас нет незавершенных матчей!')
     else:
-        pass
+        tournament_repository.set_end_date_time(tournament_id)
+        bot.send_message(user_id, 'Матч завершен!')
+        bot.send_message(user_id, 'TODO: статистика!')
