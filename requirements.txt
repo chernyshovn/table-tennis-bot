@@ -1,4 +1,6 @@
 dnspython
 flask
+Flask-SQLAlchemy
+mysqlclient
 gunicorn
 pyTelegramBotApi == 3.7.2

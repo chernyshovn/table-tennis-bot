@@ -11,4 +11,5 @@ def handle_status_command(message):
 @bot.message_handler(commands=['status'])
 def handle_status_command(message):
     sticker_id = random.choice([sticker_ids.happy_cat, sticker_ids.angry_bear])
+    bot.send_message(message.chat.id, f'ID: {message.chat.id}')
     bot.send_sticker(message.chat.id, sticker_id)
