@@ -2,13 +2,13 @@ import random
 import static.sticker_ids as sticker_ids
 from bot import bot
 from telebot import types
-from run_server import db
+import run_server
 from repositories.tournament_repository import TournamentRepository
 from repositories.location_repository import LocationRepository
 
 
-tournament_repository = TournamentRepository(db)
-location_repository = LocationRepository(db)
+tournament_repository = TournamentRepository(run_server.db)
+location_repository = LocationRepository(run_server.db)
 
 
 @bot.message_handler(commands=['start'])

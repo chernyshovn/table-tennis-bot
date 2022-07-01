@@ -2,7 +2,7 @@ import os
 import flask
 from flask_sqlalchemy import SQLAlchemy
 from telebot import types
-from bot import bot
+from bot_handlers import bot
 from config import APP_SECRET, APP_NAME, DB_CONNECTION_STRING, TELEGRAM_BOT_TOKEN
 
 
