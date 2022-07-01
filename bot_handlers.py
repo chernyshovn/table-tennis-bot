@@ -7,11 +7,13 @@ from database.database import db
 from repositories.tournament_repository import TournamentRepository
 from repositories.location_repository import LocationRepository
 from repositories.player_repository import PlayerRepository
+from services.single_match_player_adder import SingleMatchPlayerAdder
 
 
 tournament_repository = TournamentRepository(db)
 location_repository = LocationRepository(db)
 player_repository = PlayerRepository(db)
+single_match_player_adder = SingleMatchPlayerAdder(db)
 
 
 @bot.message_handler(commands=['start'])
@@ -30,7 +32,7 @@ def handle_status_command(message):
 def handle_start_single_match_command(message):
     user_id = message.chat.id
     if tournament_repository.has_active(user_id):
-        print('У вас есть незавершенная игра!')
+        bot.send_message(message.chat.id, 'У вас есть незавершенная игра!')
     else:
         markup = types.InlineKeyboardMarkup(row_width=2)
         for location in location_repository.list_all():
@@ -46,7 +48,11 @@ def handle_start_single_match_command(message):
 @bot.callback_query_handler(lambda query: query.data.startswith('Location_'))
 def process_add_location_callback(query):
     chat_id = query.message.chat.id
-    location_id = int(query.data[len('Location_'):])
+
+    pattern = re.compile(r"Location_(\d+)")
+    match = pattern.search(query.data)
+    location_id = int(match.group(1))
+
     location_name = location_repository.get_name_by_id(location_id)
     bot.delete_message(chat_id, query.message.message_id)
     tournament_repository.create(location_id, chat_id)
@@ -81,8 +87,11 @@ def process_add_player_callback(query):
 
     player_name = player_repository.get_name_by_id(player_id)
     bot.delete_message(chat_id, query.message.message_id)
-    # todo: add to repo
-    bot.send_message(chat_id, f'Игрок №{player_number}: «{player_name}»!')
+
+    tournament_id = tournament_repository.get_active_id(chat_id)
+    single_match_player_adder.add(tournament_id, player_id)
+
+    bot.send_message(chat_id, f'Игрок №{player_number}: {player_name}!')
 
     select_player(chat_id, player_number + 1)
 

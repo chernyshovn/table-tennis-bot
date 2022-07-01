@@ -28,3 +28,4 @@ class TournamentRepository:
 
             self.__db.session.add(entity)
             self.__db.session.commit()
+
