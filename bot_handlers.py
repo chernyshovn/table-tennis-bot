@@ -29,7 +29,8 @@ def handle_start_single_match_command(message):
     if tournament_repository.has_active(user_id):
         print('У вас есть незавершенная игра!')
     else:
-        bot.register_next_step_handler('Выберете локацию!', select_location)
+        msg = bot.send_message(message.chat.id, 'Выберете локацию!')
+        bot.register_next_step_handler(msg, select_location)
 
 
 def select_location(message):
