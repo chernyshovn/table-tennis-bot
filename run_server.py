@@ -12,8 +12,7 @@ server.config['SECRET_KEY'] = APP_SECRET
 server.config['SQLALCHEMY_DATABASE_URI'] = DB_CONNECTION_STRING
 server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db.app = server
-
+db.init_app(server)
 
 @server.route('/' + TELEGRAM_BOT_TOKEN, methods=['POST'])
 def get_message():
