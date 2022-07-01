@@ -9,7 +9,7 @@ class Location(db.Model):
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
-    telegramId = db.Column(db.Integer, unique=True, nullable=True)
+    telegram_id = db.Column(db.Integer, unique=True, nullable=True)
 
 
 team_player = db.Table(
