@@ -14,5 +14,5 @@ class LocationRepository:
 
     def get_name_by_id(self, id: int) -> Optional[str]:
         with app.app_context():
-            entity = Location.query.filter_by(id=id).first()
+            entity = LocationDb.query.filter_by(id=id).first()
             return entity.name if entity else None
