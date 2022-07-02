@@ -3,6 +3,7 @@ import random
 import static.sticker_ids as sticker_ids
 from bot import bot
 from telebot import types
+from telebot.handler_backends import State, StatesGroup
 from database.database import db
 from repositories.tournament_repository import TournamentRepository
 from repositories.location_repository import LocationRepository
@@ -10,6 +11,11 @@ from repositories.player_repository import PlayerRepository
 from services.single_match_player_adder import SingleMatchPlayerAdder
 from services.single_match_match_adder import SingleMatchMatchAdder
 from services.single_match_player_names_provider import SingleMatchPlayerNameProvider
+
+
+class MyStates(StatesGroup):
+    playerSelection = State()
+    matchInProgress = State()
 
 
 tournament_repository = TournamentRepository(db)
@@ -65,7 +71,7 @@ def process_add_location_callback(query):
     select_player(chat_id, 1)
 
 
-def select_player(chat_id: int, player_number: int):
+def select_player(message, player_number: int):
     if player_number <= 2:
         markup = types.InlineKeyboardMarkup(row_width=2)
         for player in player_repository.list_all():
@@ -75,16 +81,18 @@ def select_player(chat_id: int, player_number: int):
                     callback_data=f'Player_{player.id}_{player_number}'
                 )
             )
-        bot.send_message(chat_id, f'Выберете игрока №{player_number}:', reply_markup=markup)
+        bot.send_message(message.chat.id, f'Выберете игрока №{player_number}:', reply_markup=markup)
     else:
-        tournament_id = tournament_repository.get_active_id(chat_id)
+        tournament_id = tournament_repository.get_active_id(message.chat.id)
         match_id = single_match_match_adder.add(tournament_id)
         player_names = single_match_player_names_provider.get(match_id)
-        message = bot.send_message(chat_id, f'Матч начат! Введите счет гейма в формате «{player_names[0]} - {player_names[1]}»:')
-        bot.register_next_step_handler(message, start_match_callback)
+
+        bot.set_state(message.from_user.id, MyStates.matchInProgress, message.chat.id)
+        bot.send_message(message.chat.id, f'Матч начат! Введите счет гейма в формате «{player_names[0]} - {player_names[1]}»:')
 
 
-def start_match_callback(message):
+@bot.message_handler(state=MyStates.matchInProgress)
+def handle_match_in_progress(message):
     command: str = message.text
     chat_id = message.chat.id
 
@@ -100,8 +108,7 @@ def start_match_callback(message):
             msg_text = 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
         else:
             msg_text = 'Невалидный формат счета! Введите еще раз!'
-        msg = bot.send_message(chat_id, msg_text)
-        bot.register_next_step_handler(msg, start_match_callback)
+        bot.send_message(chat_id, msg_text)
 
 
 @bot.callback_query_handler(lambda query: query.data.startswith('Player_'))
@@ -126,7 +133,7 @@ def process_add_player_callback(query):
 
 @bot.message_handler(commands=['finish_match'])
 def handle_finish_match_command(message):
-    bot.clear_step_handler_by_chat_id(chat_id=message.chat.id)
+    bot.delete_state(message.from_user.id, message.chat.id)
     user_id = message.chat.id
     tournament_id = tournament_repository.get_active_id(user_id)
 
