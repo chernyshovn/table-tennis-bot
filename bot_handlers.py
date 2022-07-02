@@ -126,6 +126,7 @@ def process_add_player_callback(query):
 
 @bot.message_handler(commands=['finish_match'])
 def handle_finish_match_command(message):
+    bot.clear_step_handler_by_chat_id(chat_id=message.chat.id)
     user_id = message.chat.id
     tournament_id = tournament_repository.get_active_id(user_id)
 
