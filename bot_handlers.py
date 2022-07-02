@@ -3,8 +3,6 @@ import random
 import static.sticker_ids as sticker_ids
 from bot import bot
 from telebot import types
-from telebot.handler_backends import State, StatesGroup
-from telebot import custom_filters
 from database.database import db
 from repositories.tournament_repository import TournamentRepository
 from repositories.location_repository import LocationRepository
@@ -12,16 +10,11 @@ from repositories.player_repository import PlayerRepository
 from services.single_match_player_adder import SingleMatchPlayerAdder
 from services.single_match_match_adder import SingleMatchMatchAdder
 from services.single_match_player_names_provider import SingleMatchPlayerNameProvider
+from services.telegram_user_state_provider import TelegramUserStateProvider
+from enums.telegram_user_state import TelegramUserState
 
 
-class MyStates(StatesGroup):
-    playerSelection = State()
-    matchInProgress = State()
-
-
-bot.add_custom_filter(custom_filters.StateFilter(bot))
-
-
+telegram_user_state_manager = TelegramUserStateProvider(db)
 tournament_repository = TournamentRepository(db)
 location_repository = LocationRepository(db)
 player_repository = PlayerRepository(db)
@@ -91,12 +84,11 @@ def select_player(message, player_number: int):
         match_id = single_match_match_adder.add(tournament_id)
         player_names = single_match_player_names_provider.get(match_id)
 
-        bot.set_state(message.from_user.id, MyStates.matchInProgress, message.chat.id)
-        print(bot.get_state(message.from_user.id,message.chat.id))
+        telegram_user_state_manager.set(message.chat.id, TelegramUserState.MATCH_IN_PROGRESS)
         bot.send_message(message.chat.id, f'Матч начат! Введите счет гейма в формате «{player_names[0]} - {player_names[1]}»:')
 
 
-@bot.message_handler(state=MyStates.matchInProgress)
+@bot.message_handler(lambda message: telegram_user_state_manager.get(message.chat.id) == TelegramUserState.MATCH_IN_PROGRESS)
 def handle_match_in_progress(message):
     print('debug handle_match_in_progress')
     command: str = message.text
@@ -139,8 +131,8 @@ def process_add_player_callback(query):
 
 @bot.message_handler(commands=['finish_match'])
 def handle_finish_match_command(message):
-    bot.delete_state(message.from_user.id, message.chat.id)
     user_id = message.chat.id
+    telegram_user_state_manager.set(user_id, None)
     tournament_id = tournament_repository.get_active_id(user_id)
 
     if not tournament_id:

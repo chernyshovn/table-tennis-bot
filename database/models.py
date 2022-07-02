@@ -1,4 +1,5 @@
 from database.database import db
+from enums.telegram_user_state import TelegramUserState
 
 
 class Location(db.Model):
@@ -73,3 +74,8 @@ class Tournament(db.Model):
     location = db.relationship('Location', backref=db.backref('tournaments', lazy=True))
     teams = db.relationship('Team', secondary=tournament_team, lazy='subquery', backref=db.backref('tournaments', lazy=True))
     matches = db.relationship('Match', secondary=tournament_match, lazy='subquery', backref=db.backref('tournaments', lazy=True))
+
+
+class TelegramUserState(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.Enum(TelegramUserState), nullable=True)
