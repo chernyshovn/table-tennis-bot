@@ -20,3 +20,16 @@ class SingleMatchMatchAdder:
             self.__db.session.add(tournament)
             self.__db.session.commit()
             return match.id
+
+    def get_active_id(self, telegram_user_id: int) -> int:
+        with app.app_context():
+            match = Match.query.filter_by(initiator_telegram_user_id=telegram_user_id, end_date_time=None).first()
+            return match.id if match else None
+
+    def finish_match(self, id: int):
+        with app.app_context():
+            match = Match.query.filter_by(id=id).first()
+            if match:
+                match.end_date_time = datetime.utcnow()
+                self.__db.session.add(match)
+                self.__db.session.commit()

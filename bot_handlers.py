@@ -104,6 +104,9 @@ def handle_match_in_progress(message):
             score1 = int(re_match.group(1))
             score2 = int(re_match.group(2))
             single_match_game_adder.add(chat_id, score1, score2)
+            match_id = single_match_match_adder.get_active_id()
+            player_names = single_match_player_names_provider.get(match_id)
+            msg_text = f'{player_names[0]} {score1} - {score2} {player_names[1]}/n/n'
             msg_text = 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
         else:
             msg_text = 'Невалидный формат счета! Введите еще раз!'
@@ -135,11 +138,16 @@ def handle_finish_match_command(message):
     user_id = message.chat.id
     telegram_user_state_manager.set(user_id, None)
     tournament_id = tournament_repository.get_active_id(user_id)
+    match_id = single_match_match_adder.get_active_id(user_id)
 
-    if not tournament_id:
+    if (not tournament_id) and (not match_id):
         bot.send_message(user_id, 'У вас нет незавершенных матчей!')
     else:
-        tournament_repository.set_end_date_time(tournament_id)
+        if not tournament_id:
+            tournament_repository.set_end_date_time(tournament_id)
+        if not match_id:
+            single_match_match_adder.finish_match(match_id)
+
         bot.send_message(user_id, 'Матч завершен!')
         bot.send_message(user_id, 'TODO: статистика!')
 
