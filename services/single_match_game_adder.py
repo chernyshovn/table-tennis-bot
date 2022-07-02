@@ -9,7 +9,7 @@ class SingleMatchGameAdder:
 
     def add(self, telegram_user_id: int, player_1_score: int, player_2_score: int) -> int:
         with app.app_context():
-            match = Match.query.filter_by(initiator_telegram_user_id=telegram_user_id, end_date_time=None)
+            match = Match.query.filter_by(initiator_telegram_user_id=telegram_user_id, end_date_time=None).first()
 
             game = Game(
                 match_id=match.id,
