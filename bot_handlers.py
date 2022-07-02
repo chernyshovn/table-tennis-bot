@@ -128,7 +128,7 @@ def process_add_player_callback(query):
 
     bot.send_message(chat_id, f'Игрок №{player_number}: {player_name}!')
 
-    select_player(chat_id, player_number + 1)
+    select_player(query.message, player_number + 1)
 
 
 @bot.message_handler(commands=['finish_match'])
