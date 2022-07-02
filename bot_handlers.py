@@ -10,6 +10,7 @@ from repositories.player_repository import PlayerRepository
 from services.single_match_player_adder import SingleMatchPlayerAdder
 from services.single_match_match_adder import SingleMatchMatchAdder
 from services.single_match_player_names_provider import SingleMatchPlayerNameProvider
+from services.single_match_game_adder import SingleMatchGameAdder
 from services.telegram_user_state_provider import TelegramUserStateProvider
 from enums.telegram_user_state import TelegramUserState
 
@@ -19,6 +20,7 @@ tournament_repository = TournamentRepository(db)
 location_repository = LocationRepository(db)
 player_repository = PlayerRepository(db)
 single_match_player_adder = SingleMatchPlayerAdder(db)
+single_match_game_adder = SingleMatchGameAdder(db)
 single_match_match_adder = SingleMatchMatchAdder(db)
 single_match_player_names_provider = SingleMatchPlayerNameProvider(db)
 
@@ -90,7 +92,6 @@ def select_player(message, player_number: int):
 
 @bot.message_handler(func=lambda message: telegram_user_state_manager.get(message.chat.id) == TelegramUserState.MATCH_IN_PROGRESS)
 def handle_match_in_progress(message):
-    print('debug handle_match_in_progress')
     command: str = message.text
     chat_id = message.chat.id
 
@@ -102,7 +103,7 @@ def handle_match_in_progress(message):
         if re_match:
             score1 = int(re_match.group(1))
             score2 = int(re_match.group(2))
-            print(f'{score1} - {score2}') # todo: save to db
+            single_match_game_adder.add(chat_id, score1, score2)
             msg_text = 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
         else:
             msg_text = 'Невалидный формат счета! Введите еще раз!'
