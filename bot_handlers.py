@@ -4,6 +4,7 @@ import static.sticker_ids as sticker_ids
 from bot import bot
 from telebot import types
 from telebot.handler_backends import State, StatesGroup
+from telebot import custom_filters
 from database.database import db
 from repositories.tournament_repository import TournamentRepository
 from repositories.location_repository import LocationRepository
@@ -88,6 +89,7 @@ def select_player(message, player_number: int):
         player_names = single_match_player_names_provider.get(match_id)
 
         bot.set_state(message.from_user.id, MyStates.matchInProgress, message.chat.id)
+        print(bot.get_state(message.from_user.id,message.chat.id))
         bot.send_message(message.chat.id, f'Матч начат! Введите счет гейма в формате «{player_names[0]} - {player_names[1]}»:')
 
 
@@ -143,3 +145,6 @@ def handle_finish_match_command(message):
         tournament_repository.set_end_date_time(tournament_id)
         bot.send_message(user_id, 'Матч завершен!')
         bot.send_message(user_id, 'TODO: статистика!')
+
+
+bot.add_custom_filter(custom_filters.StateFilter(bot))
