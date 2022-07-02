@@ -106,7 +106,7 @@ def handle_match_in_progress(message):
             single_match_game_adder.add(chat_id, score1, score2)
             match_id = single_match_match_adder.get_active_id(chat_id)
             player_names = single_match_player_names_provider.get(match_id)
-            msg_text = f'{player_names[0]} {score1} - {score2} {player_names[1]}/n/n'
+            msg_text = f'{player_names[0]} {score1} - {score2} {player_names[1]}\n\n'
             msg_text += 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
         else:
             msg_text = 'Невалидный формат счета! Введите еще раз!'
