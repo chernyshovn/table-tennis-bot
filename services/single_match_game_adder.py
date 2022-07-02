@@ -12,6 +12,7 @@ class SingleMatchGameAdder:
             match = Match.query.filter_by(initiator_telegram_user_id=telegram_user_id, end_date_time=None)
 
             game = Game(
+                match_id=match.id,
                 team_1_score=player_1_score,
                 team_2_score=player_2_score,
                 date_time=datetime.utcnow()
