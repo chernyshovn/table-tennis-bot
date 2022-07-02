@@ -68,12 +68,12 @@ def process_add_location_callback(query):
     tournament_repository.create(location_id, chat_id)
     bot.send_message(chat_id, f'Локация: «{location_name}»!')
 
-    select_player(chat_id, 1)
+    select_player(query.message, 1)
 
 
 def select_player(message, player_number: int):
     if player_number <= 2:
-        markup = types.InlineKeyboardMarkup(row_width=2)
+        markup = types.InlineKeyboardMarkup(row_width=1)
         for player in player_repository.list_all():
             markup.add(
                 types.InlineKeyboardButton(
