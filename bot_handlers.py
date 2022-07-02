@@ -9,6 +9,7 @@ from repositories.location_repository import LocationRepository
 from repositories.player_repository import PlayerRepository
 from services.single_match_player_adder import SingleMatchPlayerAdder
 from services.single_match_match_adder import SingleMatchMatchAdder
+from services.single_match_player_names_provider import SingleMatchPlayerNameProvider
 
 
 tournament_repository = TournamentRepository(db)
@@ -16,6 +17,7 @@ location_repository = LocationRepository(db)
 player_repository = PlayerRepository(db)
 single_match_player_adder = SingleMatchPlayerAdder(db)
 single_match_match_adder = SingleMatchMatchAdder(db)
+single_match_player_names_provider = SingleMatchPlayerNameProvider(db)
 
 
 @bot.message_handler(commands=['start'])
@@ -76,8 +78,9 @@ def select_player(chat_id: int, player_number: int):
         bot.send_message(chat_id, f'Выберете игрока №{player_number}:', reply_markup=markup)
     else:
         tournament_id = tournament_repository.get_active_id(chat_id)
-        single_match_match_adder.add(tournament_id)
-        message = bot.send_message(chat_id, 'Матч начат! Введите счет гейма в формате «Игрок1 - Игрок2»:')
+        match_id = single_match_match_adder.add(tournament_id)
+        player_names = single_match_player_names_provider.get(match_id)
+        message = bot.send_message(chat_id, f'Матч начат! Введите счет гейма в формате «{player_names[0]} - {player_names[1]}»:')
         bot.register_next_step_handler(message, start_match_callback)
 
 

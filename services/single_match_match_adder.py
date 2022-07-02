@@ -7,7 +7,7 @@ class SingleMatchMatchAdder:
     def __init__(self, db):
         self.__db = db
 
-    def add(self, tournament_id: int):
+    def add(self, tournament_id: int) -> int:
         with app.app_context():
             tournament = Tournament.query.filter_by(id=tournament_id).first()
             match = Match(
@@ -19,3 +19,4 @@ class SingleMatchMatchAdder:
             tournament.matches.append(match)
             self.__db.session.add(tournament)
             self.__db.session.commit()
+            return match.id
