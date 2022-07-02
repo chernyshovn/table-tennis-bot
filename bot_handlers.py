@@ -19,6 +19,9 @@ class MyStates(StatesGroup):
     matchInProgress = State()
 
 
+bot.add_custom_filter(custom_filters.StateFilter(bot))
+
+
 tournament_repository = TournamentRepository(db)
 location_repository = LocationRepository(db)
 player_repository = PlayerRepository(db)
@@ -95,6 +98,7 @@ def select_player(message, player_number: int):
 
 @bot.message_handler(state=MyStates.matchInProgress)
 def handle_match_in_progress(message):
+    print('debug handle_match_in_progress')
     command: str = message.text
     chat_id = message.chat.id
 
@@ -146,5 +150,3 @@ def handle_finish_match_command(message):
         bot.send_message(user_id, 'Матч завершен!')
         bot.send_message(user_id, 'TODO: статистика!')
 
-
-bot.add_custom_filter(custom_filters.StateFilter(bot))
