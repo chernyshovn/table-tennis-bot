@@ -18,7 +18,5 @@ class SingleMatchGameAdder:
                 date_time=datetime.utcnow()
             )
 
-            match.games.append(game)
-
-            self.__db.session.add(match)
+            self.__db.session.add(game)
             self.__db.session.commit()
