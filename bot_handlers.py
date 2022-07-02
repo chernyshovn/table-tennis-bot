@@ -88,7 +88,7 @@ def select_player(message, player_number: int):
         bot.send_message(message.chat.id, f'Матч начат! Введите счет гейма в формате «{player_names[0]} - {player_names[1]}»:')
 
 
-@bot.message_handler(lambda message: telegram_user_state_manager.get(message.chat.id) == TelegramUserState.MATCH_IN_PROGRESS)
+@bot.message_handler(func=lambda message: telegram_user_state_manager.get(message.chat.id) == TelegramUserState.MATCH_IN_PROGRESS)
 def handle_match_in_progress(message):
     print('debug handle_match_in_progress')
     command: str = message.text
