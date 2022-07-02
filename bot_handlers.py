@@ -8,12 +8,14 @@ from repositories.tournament_repository import TournamentRepository
 from repositories.location_repository import LocationRepository
 from repositories.player_repository import PlayerRepository
 from services.single_match_player_adder import SingleMatchPlayerAdder
+from services.single_match_match_adder import SingleMatchMatchAdder
 
 
 tournament_repository = TournamentRepository(db)
 location_repository = LocationRepository(db)
 player_repository = PlayerRepository(db)
 single_match_player_adder = SingleMatchPlayerAdder(db)
+single_match_match_adder = SingleMatchMatchAdder(db)
 
 
 @bot.message_handler(commands=['start'])
@@ -56,7 +58,7 @@ def process_add_location_callback(query):
     location_name = location_repository.get_name_by_id(location_id)
     bot.delete_message(chat_id, query.message.message_id)
     tournament_repository.create(location_id, chat_id)
-    bot.send_message(chat_id, f'Вы выбрали локацию «{location_name}»!')
+    bot.send_message(chat_id, f'Локация: «{location_name}»!')
 
     select_player(chat_id, 1)
 
@@ -73,8 +75,9 @@ def select_player(chat_id: int, player_number: int):
             )
         bot.send_message(chat_id, f'Выберете игрока №{player_number}:', reply_markup=markup)
     else:
-        # todo: extract player names
-        message = bot.send_message(chat_id, 'Матч начат! Введите счет гейма в формате "Игрок1 - Игрок2":')
+        tournament_id = tournament_repository.get_active_id(chat_id)
+        single_match_match_adder.add(tournament_id)
+        message = bot.send_message(chat_id, 'Матч начат! Введите счет гейма в формате «Игрок1 - Игрок2»:')
         bot.register_next_step_handler(message, start_match_callback)
 
 
@@ -83,7 +86,7 @@ def start_match_callback(message):
     chat_id = message.chat.id
 
     if command == '/finish_match':
-        handle_finish_command(message)
+        handle_finish_match_command(message)
     else:
         pattern = re.compile(r"^\D*(\d+)\D+(\d+)\D*$")
         match = pattern.search(command)
@@ -118,7 +121,7 @@ def process_add_player_callback(query):
     select_player(chat_id, player_number + 1)
 
 
-def handle_finish_command(message):
+def handle_finish_match_command(message):
     user_id = message.chat.id
     tournament_id = tournament_repository.get_active_id(user_id)
 
