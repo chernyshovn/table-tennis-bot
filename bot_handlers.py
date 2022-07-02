@@ -73,7 +73,29 @@ def select_player(chat_id: int, player_number: int):
             )
         bot.send_message(chat_id, f'Выберете игрока №{player_number}:', reply_markup=markup)
     else:
-        bot.send_message(chat_id, 'TODO: Начать игру /finish_match!')
+        # todo: extract player names
+        message = bot.send_message(chat_id, 'Матч начат! Введите счет гейма в формате "Игрок1 - Игрок2":')
+        bot.register_next_step_handler(message, start_match_callback)
+
+
+def start_match_callback(message):
+    command: str = message.text
+    chat_id = message.chat.id
+
+    if command == '/finish_match':
+        handle_finish_command(message)
+    else:
+        pattern = re.compile(r"^\D*(\d+)\D+(\d+)\D*$")
+        match = pattern.search(command)
+        if match:
+            score1 = int(match.group(1))
+            score2 = int(match.group(2))
+            print(f'{score1} - {score2}') # todo: save to db
+            msg_text = 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
+        else:
+            msg_text = 'Невалидный формат счета! Введите еще раз!'
+        msg = bot.send_message(chat_id, msg_text)
+        bot.register_next_step_handler(msg, start_match_callback)
 
 
 @bot.callback_query_handler(lambda query: query.data.startswith('Player_'))
@@ -96,7 +118,6 @@ def process_add_player_callback(query):
     select_player(chat_id, player_number + 1)
 
 
-@bot.message_handler(commands=['finish_match'])
 def handle_finish_command(message):
     user_id = message.chat.id
     tournament_id = tournament_repository.get_active_id(user_id)
