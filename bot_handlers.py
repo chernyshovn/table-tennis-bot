@@ -92,10 +92,10 @@ def start_match_callback(message):
         handle_finish_match_command(message)
     else:
         pattern = re.compile(r"^\D*(\d+)\D+(\d+)\D*$")
-        match = pattern.search(command)
-        if match:
-            score1 = int(match.group(1))
-            score2 = int(match.group(2))
+        re_match = pattern.search(command)
+        if re_match:
+            score1 = int(re_match.group(1))
+            score2 = int(re_match.group(2))
             print(f'{score1} - {score2}') # todo: save to db
             msg_text = 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
         else:
@@ -124,6 +124,7 @@ def process_add_player_callback(query):
     select_player(chat_id, player_number + 1)
 
 
+@bot.message_handler(commands=['finish_match'])
 def handle_finish_match_command(message):
     user_id = message.chat.id
     tournament_id = tournament_repository.get_active_id(user_id)
