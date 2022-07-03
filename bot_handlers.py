@@ -4,15 +4,16 @@ import static.sticker_ids as sticker_ids
 from bot import bot
 from telebot import types
 from database.database import db
+from enums.telegram_user_state import TelegramUserState
 from repositories.tournament_repository import TournamentRepository
 from repositories.location_repository import LocationRepository
 from repositories.player_repository import PlayerRepository
+from services.telegram_user_state_provider import TelegramUserStateProvider
 from services.single_match_player_adder import SingleMatchPlayerAdder
 from services.single_match_match_adder import SingleMatchMatchAdder
 from services.single_match_player_names_provider import SingleMatchPlayerNameProvider
 from services.single_match_game_adder import SingleMatchGameAdder
-from services.telegram_user_state_provider import TelegramUserStateProvider
-from enums.telegram_user_state import TelegramUserState
+from services.single_match_statistic_provider import SingleMatchStatisticProvider
 
 
 telegram_user_state_manager = TelegramUserStateProvider(db)
@@ -23,6 +24,7 @@ single_match_player_adder = SingleMatchPlayerAdder(db)
 single_match_game_adder = SingleMatchGameAdder(db)
 single_match_match_adder = SingleMatchMatchAdder(db)
 single_match_player_names_provider = SingleMatchPlayerNameProvider(db)
+single_match_statistic_provider = SingleMatchStatisticProvider(db)
 
 
 @bot.message_handler(commands=['start'])
@@ -148,5 +150,4 @@ def handle_finish_match_command(message):
         if match_id:
             single_match_match_adder.finish_match(match_id)
 
-        bot.send_message(user_id, 'Матч завершен!')
-        bot.send_message(user_id, 'TODO: статистика!')
+        bot.send_message(user_id, parse_mode='html')
