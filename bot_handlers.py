@@ -5,6 +5,7 @@ from bot import bot
 from telebot import types
 from database.database import db
 from enums.telegram_user_state import TelegramUserState
+from models.match_statistic import MatchResult
 from repositories.tournament_repository import TournamentRepository
 from repositories.location_repository import LocationRepository
 from repositories.player_repository import PlayerRepository
@@ -151,4 +152,27 @@ def handle_finish_match_command(message):
             single_match_match_adder.finish_match(match_id)
 
         match_statistic = single_match_statistic_provider.get(tournament_id)
-        bot.send_message(user_id, match_statistic, parse_mode='html')
+
+        for chat_id in {user_id, match_statistic.player_1_telegram_id, match_statistic.player_2_telegram_id}:
+            if chat_id:
+                try:
+                    bot.send_message(chat_id, match_statistic.description, parse_mode='html')
+                    player_number = None
+                    if match_statistic.player_1_telegram_id == chat_id:
+                        player_number = 1
+                    elif match_statistic.player_2_telegram_id == chat_id:
+                        player_number = 2
+                    if player_number:
+                        sticker_id = None
+                        if ((match_statistic.result == MatchResult.FIRST_PLAYER_WON) and (player_number == 1)) or\
+                                ((match_statistic.result == MatchResult.SECOND_PLAYER_WON) and (player_number == 2)):
+                            sticker_id = sticker_ids.happy_cat
+                        elif ((match_statistic.result == MatchResult.FIRST_PLAYER_WON) and (player_number == 2)) or\
+                                ((match_statistic.result == MatchResult.SECOND_PLAYER_WON) and (player_number == 1)):
+                            sticker_id = sticker_ids.angry_bear
+                        elif match_statistic.result == MatchResult.DRAW:
+                            sticker_id = sticker_ids.true_friends
+                        if sticker_id:
+                            bot.send_sticker(chat_id, sticker_id)
+                except:
+                    pass
