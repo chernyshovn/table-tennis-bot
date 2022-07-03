@@ -20,13 +20,6 @@ class SingleMatchStatisticProvider:
             player_2_won_points_number = 0
             games = tournament.matches[0].games
 
-            if player_1_won_games_number > player_2_won_points_number:
-                result = MatchResult.FIRST_PLAYER_WON
-            elif player_1_won_games_number < player_2_won_points_number:
-                result = MatchResult.SECOND_PLAYER_WON
-            else:
-                result = MatchResult.DRAW
-
             for game in games:
                 if game.team_1_score > game.team_2_score:
                     player_1_won_games_number += 1
@@ -34,6 +27,13 @@ class SingleMatchStatisticProvider:
                     player_2_won_games_number += 1
                 player_1_won_points_number += game.team_1_score
                 player_2_won_points_number += game.team_2_score
+
+            if player_1_won_games_number > player_2_won_points_number:
+                result = MatchResult.FIRST_PLAYER_WON
+            elif player_1_won_games_number < player_2_won_points_number:
+                result = MatchResult.SECOND_PLAYER_WON
+            else:
+                result = MatchResult.DRAW
 
             text = '🏓 <b>Результаты игры 🏓</b>\n\n'
 
