@@ -150,4 +150,5 @@ def handle_finish_match_command(message):
         if match_id:
             single_match_match_adder.finish_match(match_id)
 
-        bot.send_message(user_id, parse_mode='html')
+        match_statistic = SingleMatchStatisticProvider(tournament_id)
+        bot.send_message(user_id, match_statistic, parse_mode='html')
