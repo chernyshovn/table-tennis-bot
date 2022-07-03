@@ -35,7 +35,7 @@ def handle_start_command(message):
 
 @bot.message_handler(commands=['status'])
 def handle_status_command(message):
-    bot.send_message(message.chat.id, f'User ID: {message.from_user.id}\n\nChat ID: {message.chat.id}')
+    bot.send_message(message.chat.id, f'User ID: {message.from_user.id}\nChat ID: {message.chat.id}')
 
 
 @bot.message_handler(commands=['start_single_match'])
@@ -111,7 +111,7 @@ def handle_match_in_progress(message):
                 msg_text = f'{player_names[0]} {score1} - {score2} {player_names[1]}\n\n'
                 msg_text += 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
             else:
-                msg_text = 'Счет не должен быть равным и не должен отличаться более чем на 2 очка! Введите еще раз!'
+                msg_text = 'Счет не может быть равным! Введите еще раз!'
         else:
             msg_text = 'Невалидный формат счета! Введите еще раз!'
         bot.send_message(chat_id, msg_text)

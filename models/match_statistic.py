@@ -4,8 +4,8 @@ import enum
 
 class MatchResult(enum.Enum):
     FIRST_PLAYER_WON = 0
-    SECOND_PLAYER_WON = 0
-    DRAW = 1
+    SECOND_PLAYER_WON = 1
+    DRAW = 2
 
 
 class MatchStatistic:
