@@ -1,5 +1,5 @@
 import re
-import random
+from typing import Optional
 import static.sticker_ids as sticker_ids
 from bot import bot
 from telebot import types
@@ -35,9 +35,7 @@ def handle_start_command(message):
 
 @bot.message_handler(commands=['status'])
 def handle_status_command(message):
-    sticker_id = random.choice([sticker_ids.happy_cat, sticker_ids.angry_bear])
-    bot.send_message(message.chat.id, f'ID: {message.chat.id}')
-    bot.send_sticker(message.chat.id, sticker_id)
+    bot.send_message(message.chat.id, f'User ID: {message.from_user.id}\n\nChat ID: {message.chat.id}')
 
 
 @bot.message_handler(commands=['start_single_match'])
@@ -106,11 +104,14 @@ def handle_match_in_progress(message):
         if re_match:
             score1 = int(re_match.group(1))
             score2 = int(re_match.group(2))
-            single_match_game_adder.add(chat_id, score1, score2)
-            match_id = single_match_match_adder.get_active_id(chat_id)
-            player_names = single_match_player_names_provider.get(match_id)
-            msg_text = f'{player_names[0]} {score1} - {score2} {player_names[1]}\n\n'
-            msg_text += 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
+            if (score1 != score2) and (abs(score2 - score1) <= 2):
+                single_match_game_adder.add(chat_id, score1, score2)
+                match_id = single_match_match_adder.get_active_id(chat_id)
+                player_names = single_match_player_names_provider.get(match_id)
+                msg_text = f'{player_names[0]} {score1} - {score2} {player_names[1]}\n\n'
+                msg_text += 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
+            else:
+                msg_text = 'Счет не должен быть равным и не должен отличаться более чем на 2 очка! Введите еще раз!'
         else:
             msg_text = 'Невалидный формат счета! Введите еще раз!'
         bot.send_message(chat_id, msg_text)
@@ -157,21 +158,31 @@ def handle_finish_match_command(message):
             if chat_id:
                 try:
                     bot.send_message(chat_id, match_statistic.description, parse_mode='html')
-                    player_number = None
+
+                    player_number: Optional[int] = None
                     if match_statistic.player_1_telegram_id == chat_id:
                         player_number = 1
                     elif match_statistic.player_2_telegram_id == chat_id:
                         player_number = 2
+
                     if player_number:
-                        sticker_id = None
+                        text: Optional[str] = None
+                        sticker_id: Optional[str] = None
                         if ((match_statistic.result == MatchResult.FIRST_PLAYER_WON) and (player_number == 1)) or\
                                 ((match_statistic.result == MatchResult.SECOND_PLAYER_WON) and (player_number == 2)):
+                            text = 'Вы выиграли! 🎉'
                             sticker_id = sticker_ids.happy_cat
                         elif ((match_statistic.result == MatchResult.FIRST_PLAYER_WON) and (player_number == 2)) or\
                                 ((match_statistic.result == MatchResult.SECOND_PLAYER_WON) and (player_number == 1)):
+                            text = 'Вы проиграли! 😃'
                             sticker_id = sticker_ids.angry_bear
                         elif match_statistic.result == MatchResult.DRAW:
+                            text = 'Ничья! 😐'
                             sticker_id = sticker_ids.true_friends
+
+                        if text:
+                            bot.send_message(chat_id, text)
+
                         if sticker_id:
                             bot.send_sticker(chat_id, sticker_id)
                 except:
