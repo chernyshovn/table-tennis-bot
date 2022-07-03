@@ -104,7 +104,7 @@ def handle_match_in_progress(message):
         if re_match:
             score1 = int(re_match.group(1))
             score2 = int(re_match.group(2))
-            if (score1 != score2) and (abs(score2 - score1) <= 2):
+            if score1 != score2:
                 single_match_game_adder.add(chat_id, score1, score2)
                 match_id = single_match_match_adder.get_active_id(chat_id)
                 player_names = single_match_player_names_provider.get(match_id)
