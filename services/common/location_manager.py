@@ -4,7 +4,7 @@ from database.models import Location as LocationDb
 from models.location import Location
 
 
-class LocationRepository:
+class LocationManager:
     def __init__(self, db):
         self.__db = db
 

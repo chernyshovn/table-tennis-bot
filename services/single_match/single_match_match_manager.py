@@ -3,7 +3,7 @@ from database.models import Tournament, Match
 from app import app
 
 
-class SingleMatchMatchAdder:
+class SingleMatchMatchManager:
     def __init__(self, db):
         self.__db = db
 

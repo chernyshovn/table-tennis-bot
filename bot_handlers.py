@@ -6,24 +6,24 @@ from telebot import types
 from database.database import db
 from enums.telegram_user_state import TelegramUserState
 from models.match_statistic import MatchResult
-from repositories.tournament_repository import TournamentRepository
-from repositories.location_repository import LocationRepository
-from repositories.player_repository import PlayerRepository
+from services.common.tournament_manager import TournamentManager
+from services.common.location_manager import LocationManager
+from services.common.player_manager import PlayerManager
 from services.telegram_user_state_provider import TelegramUserStateProvider
-from services.single_match_player_adder import SingleMatchPlayerAdder
-from services.single_match_match_adder import SingleMatchMatchAdder
-from services.single_match_player_names_provider import SingleMatchPlayerNameProvider
-from services.single_match_game_adder import SingleMatchGameAdder
-from services.single_match_statistic_provider import SingleMatchStatisticProvider
+from services.single_match.single_match_player_adder import SingleMatchPlayerAdder
+from services.single_match.single_match_match_manager import SingleMatchMatchManager
+from services.single_match.single_match_player_names_provider import SingleMatchPlayerNameProvider
+from services.single_match.single_match_game_adder import SingleMatchGameAdder
+from services.single_match.single_match_statistic_provider import SingleMatchStatisticProvider
 
 
 telegram_user_state_manager = TelegramUserStateProvider(db)
-tournament_repository = TournamentRepository(db)
-location_repository = LocationRepository(db)
-player_repository = PlayerRepository(db)
+tournament_manager = TournamentManager(db)
+location_manager = LocationManager(db)
+player_manager = PlayerManager(db)
 single_match_player_adder = SingleMatchPlayerAdder(db)
 single_match_game_adder = SingleMatchGameAdder(db)
-single_match_match_adder = SingleMatchMatchAdder(db)
+single_match_match_manager = SingleMatchMatchManager(db)
 single_match_player_names_provider = SingleMatchPlayerNameProvider(db)
 single_match_statistic_provider = SingleMatchStatisticProvider(db)
 
@@ -41,11 +41,11 @@ def handle_status_command(message):
 @bot.message_handler(commands=['start_single_match'])
 def handle_start_single_match_command(message):
     user_id = message.chat.id
-    if tournament_repository.has_active(user_id):
+    if tournament_manager.has_active(user_id):
         bot.send_message(message.chat.id, 'У вас есть незавершенная игра!')
     else:
         markup = types.InlineKeyboardMarkup(row_width=2)
-        for location in location_repository.list_all():
+        for location in location_manager.list_all():
             markup.add(
                 types.InlineKeyboardButton(
                     location.name,
@@ -63,9 +63,9 @@ def process_add_location_callback(query):
     match = pattern.search(query.data)
     location_id = int(match.group(1))
 
-    location_name = location_repository.get_name_by_id(location_id)
+    location_name = location_manager.get_name_by_id(location_id)
     bot.delete_message(chat_id, query.message.message_id)
-    tournament_repository.create(location_id, chat_id)
+    tournament_manager.create(location_id, chat_id)
     bot.send_message(chat_id, f'Локация: «{location_name}»!')
 
     select_player(query.message, 1)
@@ -74,7 +74,7 @@ def process_add_location_callback(query):
 def select_player(message, player_number: int):
     if player_number <= 2:
         markup = types.InlineKeyboardMarkup(row_width=1)
-        for player in player_repository.list_all():
+        for player in player_manager.list_all():
             markup.add(
                 types.InlineKeyboardButton(
                     player.name,
@@ -83,8 +83,8 @@ def select_player(message, player_number: int):
             )
         bot.send_message(message.chat.id, f'Выберете игрока №{player_number}:', reply_markup=markup)
     else:
-        tournament_id = tournament_repository.get_active_id(message.chat.id)
-        match_id = single_match_match_adder.add(tournament_id)
+        tournament_id = tournament_manager.get_active_id(message.chat.id)
+        match_id = single_match_match_manager.add(tournament_id)
         player_names = single_match_player_names_provider.get(match_id)
 
         telegram_user_state_manager.set(message.chat.id, TelegramUserState.MATCH_IN_PROGRESS)
@@ -106,7 +106,7 @@ def handle_match_in_progress(message):
             score2 = int(re_match.group(2))
             if score1 != score2:
                 single_match_game_adder.add(chat_id, score1, score2)
-                match_id = single_match_match_adder.get_active_id(chat_id)
+                match_id = single_match_match_manager.get_active_id(chat_id)
                 player_names = single_match_player_names_provider.get(match_id)
                 msg_text = f'{player_names[0]} {score1} - {score2} {player_names[1]}\n\n'
                 msg_text += 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
@@ -126,10 +126,10 @@ def process_add_player_callback(query):
     player_id = int(match.group(1))
     player_number = int(match.group(2))
 
-    player_name = player_repository.get_name_by_id(player_id)
+    player_name = player_manager.get_name_by_id(player_id)
     bot.delete_message(chat_id, query.message.message_id)
 
-    tournament_id = tournament_repository.get_active_id(chat_id)
+    tournament_id = tournament_manager.get_active_id(chat_id)
     single_match_player_adder.add(tournament_id, player_id)
 
     bot.send_message(chat_id, f'Игрок №{player_number}: {player_name}!')
@@ -141,16 +141,16 @@ def process_add_player_callback(query):
 def handle_finish_match_command(message):
     user_id = message.chat.id
     telegram_user_state_manager.set(user_id, None)
-    tournament_id = tournament_repository.get_active_id(user_id)
-    match_id = single_match_match_adder.get_active_id(user_id)
+    tournament_id = tournament_manager.get_active_id(user_id)
+    match_id = single_match_match_manager.get_active_id(user_id)
 
     if (not tournament_id) and (not match_id):
         bot.send_message(user_id, 'У вас нет незавершенных матчей!')
     else:
         if tournament_id:
-            tournament_repository.set_end_date_time(tournament_id)
+            tournament_manager.set_end_date_time(tournament_id)
         if match_id:
-            single_match_match_adder.finish_match(match_id)
+            single_match_match_manager.finish_match(match_id)
 
         match_statistic = single_match_statistic_provider.get(tournament_id)
 

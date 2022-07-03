@@ -35,6 +35,7 @@ tournament_team = db.Table(
     db.Column('team_id', db.Integer, db.ForeignKey('team.id'), nullable=False)
 )
 
+
 tournament_match = db.Table(
     'tournament_match',
     db.Column('id', db.Integer, primary_key=True),

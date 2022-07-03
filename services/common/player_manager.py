@@ -4,7 +4,7 @@ from database.models import Player as PlayerDb
 from models.player import Player
 
 
-class PlayerRepository:
+class PlayerManager:
     def __init__(self, db):
         self.__db = db
 

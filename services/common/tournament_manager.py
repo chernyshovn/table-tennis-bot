@@ -4,7 +4,7 @@ from app import app
 from database.models import Tournament
 
 
-class TournamentRepository:
+class TournamentManager:
     def __init__(self, db):
         self.__db = db
 
