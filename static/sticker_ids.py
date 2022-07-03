@@ -1,3 +1,4 @@
-happy_cat = 'CAACAgIAAxkBAAEFKvBivg04SrW8timzIyHWaxGKXFT3lAACmQoAAkKvaQABqQx-HZHejzEpBA'
-angry_bear = 'CAACAgIAAxkBAAEFKvJivg1SVzT0W-MciRyoA4aBDUrLvwACJRMAAkKvaQABFKxDSf9OkD8pBA'
-true_friends = 'CAACAgIAAxkBAAEFLuNiwbNsLnHt4Majk0tJbrDWlUkjTAAC4A8AAp7OCwABQgyUU2n_qn0pBA'
+class StickerIds:
+    happy_cat = 'CAACAgIAAxkBAAEFKvBivg04SrW8timzIyHWaxGKXFT3lAACmQoAAkKvaQABqQx-HZHejzEpBA'
+    angry_bear = 'CAACAgIAAxkBAAEFKvJivg1SVzT0W-MciRyoA4aBDUrLvwACJRMAAkKvaQABFKxDSf9OkD8pBA'
+    true_friends = 'CAACAgIAAxkBAAEFLuNiwbNsLnHt4Majk0tJbrDWlUkjTAAC4A8AAp7OCwABQgyUU2n_qn0pBA'

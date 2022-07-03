@@ -1,10 +1,10 @@
 import re
 from typing import Optional
-import static.sticker_ids as sticker_ids
 from bot import bot
 from telebot import types
 from database.database import db
 from enums.telegram_user_state import TelegramUserState
+from static.sticker_ids import StickerIds
 from models.match_statistic import MatchResult
 from services.common.tournament_manager import TournamentManager
 from services.common.location_manager import LocationManager
@@ -171,14 +171,14 @@ def handle_finish_match_command(message):
                         if ((match_statistic.result == MatchResult.FIRST_PLAYER_WON) and (player_number == 1)) or\
                                 ((match_statistic.result == MatchResult.SECOND_PLAYER_WON) and (player_number == 2)):
                             text = 'Вы выиграли! 🎉'
-                            sticker_id = sticker_ids.happy_cat
+                            sticker_id = StickerIds.happy_cat
                         elif ((match_statistic.result == MatchResult.FIRST_PLAYER_WON) and (player_number == 2)) or\
                                 ((match_statistic.result == MatchResult.SECOND_PLAYER_WON) and (player_number == 1)):
                             text = 'Вы проиграли! 😃'
-                            sticker_id = sticker_ids.angry_bear
+                            sticker_id = StickerIds.angry_bear
                         elif match_statistic.result == MatchResult.DRAW:
                             text = 'Ничья! 😐'
-                            sticker_id = sticker_ids.true_friends
+                            sticker_id = StickerIds.true_friends
 
                         if text:
                             bot.send_message(chat_id, text)
