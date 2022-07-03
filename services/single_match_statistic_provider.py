@@ -34,7 +34,9 @@ class SingleMatchStatisticProvider:
                 result = MatchResult.DRAW
 
             text = '🏓 <b>Результаты игры 🏓</b>\n\n'
-            text += f'<b>{tournament.location.name}</b>\n\n'
+
+            text += f'<b>{tournament.location.name}</b>\n'
+            text += f'<b>{player_1.name} - {player_2.name}</b>\n\n'
 
             # todo datetime
 
