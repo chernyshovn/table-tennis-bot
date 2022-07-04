@@ -123,11 +123,11 @@ def handle_match_in_progress(message):
                 msg_text += '<b>Текущий счет по геймам:</b>\n'
                 msg_text += f'{first_player_name} {match_score.first_team_score} - {match_score.second_team_score} {second_player_name}\n\n'
                 msg_text += 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
+                bot.send_message(chat_id, msg_text, parse_mode='html')
             else:
-                msg_text = 'Счет не может быть равным! Введите еще раз!'
+                send_invalid_command_message(chat_id, 'Счет не может быть равным! Введите еще раз!')
         else:
-            msg_text = 'Невалидный формат счета! Введите еще раз!'
-        bot.send_message(chat_id, msg_text, parse_mode='html')
+            send_invalid_command_message(chat_id, 'Невалидный формат счета! Введите еще раз!')
 
 
 @bot.callback_query_handler(lambda query: query.data.startswith('Player_'))
@@ -200,3 +200,13 @@ def handle_finish_match_command(message):
                             bot.send_sticker(chat_id, sticker_id)
                 except:
                     pass
+
+
+@bot.message_handler(func=lambda message: True)
+def unsupported_command_handler(message):
+    send_invalid_command_message(message.chat.id, 'Неподдерживаемая команда!')
+
+
+def send_invalid_command_message(chat_id, text: str) -> None:
+    bot.send_message(chat_id, text)
+    bot.send_sticker(chat_id, StickerIds.angry_punica)
