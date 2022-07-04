@@ -48,13 +48,15 @@ def handle_start_single_match_command(message):
         bot.send_message(message.chat.id, 'У вас есть незавершенная игра!')
     else:
         markup = types.InlineKeyboardMarkup(row_width=2)
+        buttons = []
         for location in location_manager.list_all():
-            markup.add(
+            buttons.append(
                 types.InlineKeyboardButton(
                     location.name,
                     callback_data=f'Location_{location.id}'
                 )
             )
+        markup.add(buttons)
         bot.send_message(message.chat.id, 'Выберете локацию:', reply_markup=markup)
 
 
@@ -76,14 +78,16 @@ def process_add_location_callback(query):
 
 def select_player(message, player_number: int):
     if player_number <= 2:
-        markup = types.InlineKeyboardMarkup(row_width=1)
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        buttons = []
         for player in player_manager.list_all():
-            markup.add(
+            buttons.append(
                 types.InlineKeyboardButton(
                     player.name,
                     callback_data=f'Player_{player.id}_{player_number}'
                 )
             )
+        markup.add(buttons)
         bot.send_message(message.chat.id, f'Выберете игрока №{player_number}:', reply_markup=markup)
     else:
         tournament_id = tournament_manager.get_active_id(message.chat.id)
