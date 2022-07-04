@@ -47,7 +47,7 @@ def handle_start_single_match_command(message):
     if tournament_manager.has_active(user_id):
         bot.send_message(message.chat.id, 'У вас есть незавершенная игра!')
     else:
-        markup = types.InlineKeyboardMarkup(row_width=3)
+        markup = types.InlineKeyboardMarkup(row_width=2)
         buttons = []
         for location in location_manager.list_all():
             buttons.append(
@@ -78,7 +78,7 @@ def process_add_location_callback(query):
 
 def select_player(message, player_number: int):
     if player_number <= 2:
-        markup = types.InlineKeyboardMarkup(row_width=3)
+        markup = types.InlineKeyboardMarkup(row_width=2)
         buttons = []
         for player in player_manager.list_all():
             buttons.append(
