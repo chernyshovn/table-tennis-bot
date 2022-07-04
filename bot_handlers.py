@@ -77,10 +77,12 @@ def process_add_location_callback(query):
 
 
 def select_player(message, player_number: int):
+    tournament_id = tournament_manager.get_active_id(message.chat.id)
+
     if player_number <= 2:
         markup = types.InlineKeyboardMarkup(row_width=2)
         buttons = []
-        for player in player_manager.list_all():
+        for player in player_manager.list_not_in_tournament(tournament_id):
             buttons.append(
                 types.InlineKeyboardButton(
                     player.name,
@@ -90,7 +92,6 @@ def select_player(message, player_number: int):
         markup.add(*buttons)
         bot.send_message(message.chat.id, f'Выберете игрока №{player_number}:', reply_markup=markup)
     else:
-        tournament_id = tournament_manager.get_active_id(message.chat.id)
         match_id = single_match_match_manager.add(tournament_id)
         player_names = single_match_player_names_provider.get(match_id)
 
