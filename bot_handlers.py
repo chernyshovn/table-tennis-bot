@@ -56,7 +56,7 @@ def handle_start_single_match_command(message):
                     callback_data=f'Location_{location.id}'
                 )
             )
-        markup.add(buttons)
+        markup.add(*buttons)
         bot.send_message(message.chat.id, 'Выберете локацию:', reply_markup=markup)
 
 
@@ -87,7 +87,7 @@ def select_player(message, player_number: int):
                     callback_data=f'Player_{player.id}_{player_number}'
                 )
             )
-        markup.add(buttons)
+        markup.add(*buttons)
         bot.send_message(message.chat.id, f'Выберете игрока №{player_number}:', reply_markup=markup)
     else:
         tournament_id = tournament_manager.get_active_id(message.chat.id)
