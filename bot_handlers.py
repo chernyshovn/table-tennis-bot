@@ -9,6 +9,7 @@ from models.match_statistic import MatchResult
 from services.common.tournament_manager import TournamentManager
 from services.common.location_manager import LocationManager
 from services.common.player_manager import PlayerManager
+from services.common.match_score_provider import MatchScoreProvider
 from services.telegram_user_state_provider import TelegramUserStateProvider
 from services.single_match.single_match_player_adder import SingleMatchPlayerAdder
 from services.single_match.single_match_match_manager import SingleMatchMatchManager
@@ -21,6 +22,7 @@ telegram_user_state_manager = TelegramUserStateProvider(db)
 tournament_manager = TournamentManager(db)
 location_manager = LocationManager(db)
 player_manager = PlayerManager(db)
+match_score_provider = MatchScoreProvider()
 single_match_player_adder = SingleMatchPlayerAdder(db)
 single_match_game_adder = SingleMatchGameAdder(db)
 single_match_match_manager = SingleMatchMatchManager(db)
@@ -105,10 +107,15 @@ def handle_match_in_progress(message):
             score1 = int(re_match.group(1))
             score2 = int(re_match.group(2))
             if score1 != score2:
-                single_match_game_adder.add(chat_id, score1, score2)
                 match_id = single_match_match_manager.get_active_id(chat_id)
+                single_match_game_adder.add(chat_id, score1, score2)
                 player_names = single_match_player_names_provider.get(match_id)
-                msg_text = f'{player_names[0]} {score1} - {score2} {player_names[1]}\n\n'
+                first_player_name = player_names[0]
+                second_player_name = player_names[1]
+                match_score = match_score_provider.get(match_id)
+                msg_text = f'{first_player_name} {score1} - {score2} {second_player_name}\n\n'
+                msg_text += 'Текущий счет по геймам:\n'
+                msg_text += f'{first_player_name} {match_score.first_team_score} - {match_score.second_team_score} {second_player_name}\n\n'
                 msg_text += 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
             else:
                 msg_text = 'Счет не может быть равным! Введите еще раз!'
