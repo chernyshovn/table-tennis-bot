@@ -4,6 +4,7 @@ from typing import Optional
 from bot import bot
 from telebot import types
 from database.database import db
+from decorators.validation_decorator import validate_user
 from enums.telegram_user_state import TelegramUserState
 from static.sticker_ids import StickerIds
 from models.match_statistic import MatchResult
@@ -33,7 +34,7 @@ single_match_statistic_provider = SingleMatchStatisticProvider(db, timedelta(hou
 
 @bot.message_handler(commands=['start'])
 def handle_start_command(message):
-    bot.send_message(message.chat.id, 'Вы подписались на бот!')
+    bot.send_message(message.chat.id, 'Добро пожаловать в бот!')
 
 
 @bot.message_handler(commands=['status'])
@@ -42,6 +43,7 @@ def handle_status_command(message):
 
 
 @bot.message_handler(commands=['start_single_match'])
+@validate_user
 def handle_start_single_match_command(message):
     user_id = message.chat.id
     if tournament_manager.has_active(user_id):
@@ -100,6 +102,7 @@ def select_player(message, player_number: int):
 
 
 @bot.message_handler(func=lambda message: telegram_user_state_manager.get(message.chat.id) == TelegramUserState.MATCH_IN_PROGRESS)
+@validate_user
 def handle_match_in_progress(message):
     command: str = message.text
     chat_id = message.chat.id
@@ -151,6 +154,7 @@ def process_add_player_callback(query):
 
 
 @bot.message_handler(commands=['finish_match'])
+@validate_user
 def handle_finish_match_command(message):
     user_id = message.chat.id
     telegram_user_state_manager.set(user_id, None)

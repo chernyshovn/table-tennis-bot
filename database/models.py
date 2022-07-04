@@ -80,3 +80,9 @@ class Tournament(db.Model):
 class TelegramUserState(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.Enum(TelegramUserState), nullable=True)
+
+
+class TelegramUser(db.Model):
+    chat_id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(100), nullable=True)
+    has_access = db.Column(db.Boolean, nullable=False)
