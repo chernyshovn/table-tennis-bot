@@ -1,4 +1,5 @@
 import re
+from datetime import timedelta
 from typing import Optional
 from bot import bot
 from telebot import types
@@ -27,7 +28,7 @@ single_match_player_adder = SingleMatchPlayerAdder(db)
 single_match_game_adder = SingleMatchGameAdder(db)
 single_match_match_manager = SingleMatchMatchManager(db)
 single_match_player_names_provider = SingleMatchPlayerNameProvider(db)
-single_match_statistic_provider = SingleMatchStatisticProvider(db)
+single_match_statistic_provider = SingleMatchStatisticProvider(db, timedelta(hours=3))
 
 
 @bot.message_handler(commands=['start'])
@@ -113,15 +114,15 @@ def handle_match_in_progress(message):
                 first_player_name = player_names[0]
                 second_player_name = player_names[1]
                 match_score = match_score_provider.get(match_id)
-                msg_text = f'{first_player_name} {score1} - {score2} {second_player_name}\n\n'
-                msg_text += 'Текущий счет по геймам:\n'
+                msg_text = f'<b>{first_player_name} {score1} - {score2} {second_player_name}</b>\n\n'
+                msg_text += '<b>Текущий счет по геймам:</b>\n'
                 msg_text += f'{first_player_name} {match_score.first_team_score} - {match_score.second_team_score} {second_player_name}\n\n'
                 msg_text += 'Введите счет следующего гейма или выполните команду /finish_match для завершения игры!'
             else:
                 msg_text = 'Счет не может быть равным! Введите еще раз!'
         else:
             msg_text = 'Невалидный формат счета! Введите еще раз!'
-        bot.send_message(chat_id, msg_text)
+        bot.send_message(chat_id, msg_text, parse_mode='html')
 
 
 @bot.callback_query_handler(lambda query: query.data.startswith('Player_'))

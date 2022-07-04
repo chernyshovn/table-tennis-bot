@@ -1,11 +1,14 @@
+from datetime import timedelta
 from app import app
 from database.models import Tournament
 from models.match_statistic import MatchStatistic, MatchResult
+from utils.datetime_utils import DatetimeUtils
 
 
 class SingleMatchStatisticProvider:
-    def __init__(self, db):
+    def __init__(self, db, time_shift: timedelta):
         self.__db = db
+        self.__time_shift = time_shift
 
     def get(self, tournament_id: int) -> MatchStatistic:
         with app.app_context():
@@ -33,12 +36,17 @@ class SingleMatchStatisticProvider:
             else:
                 result = MatchResult.DRAW
 
+            start_date_time = tournament.start_date_time
+            end_date_time = tournament.end_date_time
+
             text = '🏓 <b>Результаты игры 🏓</b>\n\n'
 
             text += f'<b>{tournament.location.name}</b>\n'
-            text += f'<b>{player_1.name} - {player_2.name}</b>\n\n'
+            text += f'<b>{player_1.name} - {player_2.name}</b>\n'
+            text += f'{DatetimeUtils.to_ddmmyyyy_hhmm(start_date_time, self.__time_shift)} - ' \
+                    f'{DatetimeUtils.to_ddmmyyyy_hhmm(end_date_time, self.__time_shift)}\n\n'
 
-            # todo datetime
+            text += f'<b>Продолжительность:</b> {DatetimeUtils.to_hhmm_diff(end_date_time, start_date_time)}\n\n'
 
             text += '<b>Счет по геймам:</b>\n'
             text += f'{player_1.name} {player_1_won_game_count} - {player_2_won_game_count} {player_2.name}\n\n'
