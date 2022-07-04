@@ -39,7 +39,7 @@ class SingleMatchStatisticProvider:
             start_date_time = tournament.start_date_time
             end_date_time = tournament.end_date_time
 
-            text = '🏓 <b>Результаты игры 🏓</b>\n\n'
+            text = '🏓 <b>Результаты матча 🏓</b>\n\n'
 
             text += f'<b>{tournament.location.name}</b>\n'
             text += f'<b>{player_1.name} - {player_2.name}</b>\n'

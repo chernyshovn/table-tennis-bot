@@ -186,7 +186,7 @@ def handle_finish_match_command(message):
                             sticker_id = StickerIds.angry_bear
                         elif match_statistic.result == MatchResult.DRAW:
                             text = 'Ничья! 😐'
-                            sticker_id = StickerIds.true_friends
+                            sticker_id = StickerIds.idk_desman
 
                         if text:
                             bot.send_message(chat_id, text)
