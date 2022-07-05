@@ -5,3 +5,4 @@ class StickerIds:
     true_friends = 'CAACAgIAAxkBAAEFLuNiwbNsLnHt4Majk0tJbrDWlUkjTAAC4A8AAp7OCwABQgyUU2n_qn0pBA'
     idk_desman = 'CAACAgIAAxkBAAEFMEViws8u8oOBMnarU2RNxTAeithM_QACJxMAAkKvaQABWZvlHrf3OJkpBA'
     boor = 'CAACAgIAAxkBAAEFMxFixHwVS3iz8vEYL88-QjlKSobhtAACzwIAAv5QNQAB6CzfZYE8e_MpBA'
+    gagarin = 'CAACAgIAAxkBAAEFMxlixICJfmXwO1h-RmiQMV6v-J3U1gAC_g0AAh2ymUtoykEGq3itRSkE'

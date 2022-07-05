@@ -81,6 +81,7 @@ def process_add_location_callback(query):
 
 
 def select_player(message, player_number: int):
+    chat_id = message.chat.id
     tournament_id = tournament_manager.get_active_id(message.chat.id)
 
     if player_number <= 2:
@@ -94,13 +95,14 @@ def select_player(message, player_number: int):
                 )
             )
         markup.add(*buttons)
-        bot.send_message(message.chat.id, f'Выберете игрока №{player_number}:', reply_markup=markup)
+        bot.send_message(chat_id, f'Выберете игрока №{player_number}:', reply_markup=markup)
     else:
         match_id = single_match_match_manager.add(tournament_id)
         player_names = single_match_player_names_provider.get(match_id)
 
-        telegram_user_state_manager.set(message.chat.id, TelegramUserState.MATCH_IN_PROGRESS)
-        bot.send_message(message.chat.id, f'Матч начат! Введите счет гейма в формате «{player_names[0]} - {player_names[1]}»:')
+        telegram_user_state_manager.set(chat_id, TelegramUserState.MATCH_IN_PROGRESS)
+        bot.send_sticker(chat_id, StickerIds.gagarin)
+        bot.send_message(chat_id, f'Матч начат! Введите счет гейма в формате «{player_names[0]} - {player_names[1]}»:')
 
 
 @bot.message_handler(func=lambda message: telegram_user_state_manager.get(message.chat.id) == TelegramUserState.MATCH_IN_PROGRESS)
@@ -176,6 +178,7 @@ def handle_finish_match_command(message):
 
     if match_statistic.is_no_games():
         tournament_manager.delete(tournament_id)
+        bot.send_message(user_id, 'Вы не сыграли ни одного гейма!')
         bot.send_sticker(user_id, StickerIds.boor)
         return
 
