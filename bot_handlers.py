@@ -8,6 +8,7 @@ from decorators.validation_decorator import validate_user
 from enums.telegram_user_state import TelegramUserState
 from static.sticker_ids import StickerIds
 from models.match_statistic import MatchResult
+from services.common.telegram_user_manager import TelegramUserManager
 from services.common.tournament_manager import TournamentManager
 from services.common.location_manager import LocationManager
 from services.common.player_manager import PlayerManager
@@ -20,6 +21,7 @@ from services.single_match.single_match_game_adder import SingleMatchGameAdder
 from services.single_match.single_match_statistic_provider import SingleMatchStatisticProvider
 
 
+telegram_user_manager = TelegramUserManager()
 telegram_user_state_manager = TelegramUserStateProvider(db)
 tournament_manager = TournamentManager(db)
 location_manager = LocationManager(db)
@@ -171,7 +173,10 @@ def handle_finish_match_command(message):
 
         match_statistic = single_match_statistic_provider.get(tournament_id)
 
-        for chat_id in {user_id, match_statistic.player_1_telegram_id, match_statistic.player_2_telegram_id}:
+        chat_ids = {user_id, match_statistic.player_1_telegram_id, match_statistic.player_2_telegram_id}
+        chat_ids.update(telegram_user_manager.list_subscribed_to_all_notifications())
+
+        for chat_id in chat_ids:
             if chat_id:
                 try:
                     bot.send_message(chat_id, match_statistic.description, parse_mode='html')
