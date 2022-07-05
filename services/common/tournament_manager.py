@@ -34,3 +34,9 @@ class TournamentManager:
 
             self.__db.session.add(entity)
             self.__db.session.commit()
+
+    def delete(self, id: int) -> None:
+        with app.app_context():
+            entity = Tournament.query.get(id)
+            self.__db.session.delete(entity)
+            self.__db.session.commit()

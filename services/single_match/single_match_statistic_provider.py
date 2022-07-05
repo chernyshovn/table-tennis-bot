@@ -24,7 +24,10 @@ class SingleMatchStatisticProvider:
             for game in games:
                 if game.team_1_score > game.team_2_score:
                     player_1_won_game_count += 1
+                elif game.team_1_score < game.team_2_score:
+                    player_2_won_game_count += 1
                 else:
+                    player_1_won_game_count += 1
                     player_2_won_game_count += 1
                 player_1_won_point_count += game.team_1_score
                 player_2_won_point_count += game.team_2_score
@@ -62,5 +65,9 @@ class SingleMatchStatisticProvider:
                 result=result,
                 player_1_telegram_id=player_1.telegram_id,
                 player_2_telegram_id=player_2.telegram_id,
+                player_1_games_won=player_1_won_game_count,
+                player_2_games_won=player_2_won_game_count,
+                player_1_points_won=player_1_won_point_count,
+                player_2_points_won=player_2_won_point_count,
                 description=text
             )

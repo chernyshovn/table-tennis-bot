@@ -165,50 +165,56 @@ def handle_finish_match_command(message):
 
     if (not tournament_id) and (not match_id):
         bot.send_message(user_id, 'У вас нет незавершенных матчей!')
-    else:
-        if tournament_id:
-            tournament_manager.set_end_date_time(tournament_id)
-        if match_id:
-            single_match_match_manager.finish_match(match_id)
+        return
 
-        match_statistic = single_match_statistic_provider.get(tournament_id)
+    if tournament_id:
+        tournament_manager.set_end_date_time(tournament_id)
+    if match_id:
+        single_match_match_manager.finish_match(match_id)
 
-        chat_ids = {user_id, match_statistic.player_1_telegram_id, match_statistic.player_2_telegram_id}
-        chat_ids.update(telegram_user_manager.list_subscribed_to_all_notifications())
+    match_statistic = single_match_statistic_provider.get(tournament_id)
 
-        for chat_id in chat_ids:
-            if chat_id:
-                try:
-                    bot.send_message(chat_id, match_statistic.description, parse_mode='html')
+    if match_statistic.is_no_games():
+        tournament_manager.delete(tournament_id)
+        bot.send_sticker(user_id, StickerIds.boor)
+        return
 
-                    player_number: Optional[int] = None
-                    if match_statistic.player_1_telegram_id == chat_id:
-                        player_number = 1
-                    elif match_statistic.player_2_telegram_id == chat_id:
-                        player_number = 2
+    chat_ids = {user_id, match_statistic.player_1_telegram_id, match_statistic.player_2_telegram_id}
+    chat_ids.update(telegram_user_manager.list_subscribed_to_all_notifications())
 
-                    if player_number:
-                        text: Optional[str] = None
-                        sticker_id: Optional[str] = None
-                        if ((match_statistic.result == MatchResult.FIRST_PLAYER_WON) and (player_number == 1)) or\
-                                ((match_statistic.result == MatchResult.SECOND_PLAYER_WON) and (player_number == 2)):
-                            text = 'Вы выиграли! 🎉'
-                            sticker_id = StickerIds.happy_cat
-                        elif ((match_statistic.result == MatchResult.FIRST_PLAYER_WON) and (player_number == 2)) or\
-                                ((match_statistic.result == MatchResult.SECOND_PLAYER_WON) and (player_number == 1)):
-                            text = 'Вы проиграли! 😃'
-                            sticker_id = StickerIds.angry_bear
-                        elif match_statistic.result == MatchResult.DRAW:
-                            text = 'Ничья! 😐'
-                            sticker_id = StickerIds.idk_desman
+    for chat_id in chat_ids:
+        if chat_id:
+            try:
+                bot.send_message(chat_id, match_statistic.description, parse_mode='html')
 
-                        if text:
-                            bot.send_message(chat_id, text)
+                player_number: Optional[int] = None
+                if match_statistic.player_1_telegram_id == chat_id:
+                    player_number = 1
+                elif match_statistic.player_2_telegram_id == chat_id:
+                    player_number = 2
 
-                        if sticker_id:
-                            bot.send_sticker(chat_id, sticker_id)
-                except:
-                    pass
+                if player_number:
+                    text: Optional[str] = None
+                    sticker_id: Optional[str] = None
+                    if ((match_statistic.result == MatchResult.FIRST_PLAYER_WON) and (player_number == 1)) or\
+                            ((match_statistic.result == MatchResult.SECOND_PLAYER_WON) and (player_number == 2)):
+                        text = 'Вы выиграли! 🎉'
+                        sticker_id = StickerIds.happy_cat
+                    elif ((match_statistic.result == MatchResult.FIRST_PLAYER_WON) and (player_number == 2)) or\
+                            ((match_statistic.result == MatchResult.SECOND_PLAYER_WON) and (player_number == 1)):
+                        text = 'Вы проиграли! 😃'
+                        sticker_id = StickerIds.angry_bear
+                    elif match_statistic.result == MatchResult.DRAW:
+                        text = 'Ничья! 😐'
+                        sticker_id = StickerIds.idk_desman
+
+                    if text:
+                        bot.send_message(chat_id, text)
+
+                    if sticker_id:
+                        bot.send_sticker(chat_id, sticker_id)
+            except:
+                pass
 
 
 @bot.message_handler(func=lambda message: True)
