@@ -11,6 +11,8 @@ class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     telegram_id = db.Column(db.Integer, unique=True, nullable=True)
+    is_active = db.Column(db.Boolean, nullable=False)
+    creation_date_time = db.Column(db.DateTime, nullable=False)
 
 
 team_player = db.Table(

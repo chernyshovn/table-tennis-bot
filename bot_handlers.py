@@ -220,8 +220,29 @@ def handle_finish_match_command(message):
                 pass
 
 
+@bot.message_handler(func=lambda message: message.text.strip().startswith('-create-player'))
+@validate_user
+def handle_create_player_command(message):
+    pattern = re.compile(r"^\s*-create-player\s+(\S+)\s*$")
+    regex_match = pattern.search(message.text)
+    if regex_match:
+        chat_id = message.chat.id
+        name = str(regex_match.group(1))
+        player = player_manager.get_by_name(name)
+        if not player:
+            player_manager.create(name)
+            bot.send_message(chat_id, f'Игрок «{name}» добавлен!')
+        elif not player.is_active:
+            player_manager.update_is_active(player.id, True)
+            bot.send_message(chat_id, f'Игрок «{name}» уже существует, но был не активен! Теперь он доступен при создании матча/турнира!')
+        else:
+            bot.send_message(chat_id, f'Игрок «{name}» уже существует!')
+    else:
+        handle_unsupported_command(message)
+
+
 @bot.message_handler(func=lambda message: True)
-def unsupported_command_handler(message):
+def handle_unsupported_command(message):
     send_invalid_command_message(message.chat.id, 'Неподдерживаемая команда!')
 
 
