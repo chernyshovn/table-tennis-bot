@@ -223,7 +223,7 @@ def handle_finish_match_command(message):
 @bot.message_handler(func=lambda message: message.text.strip().startswith('-create-player'))
 @validate_user
 def handle_create_player_command(message):
-    pattern = re.compile(r"^\s*-create-player\s+(\S+)\s*$")
+    pattern = re.compile(r"^\s*-create-player\s+(.+)\s*$")
     regex_match = pattern.search(message.text)
     if regex_match:
         chat_id = message.chat.id
