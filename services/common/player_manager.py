@@ -42,7 +42,10 @@ class PlayerManager:
                     player.is_active,
                     player.creation_date_time
                 )
-                for player in PlayerDb.query.filter(~PlayerDb.id.in_(player_in_tournament_ids)).order_by(PlayerDb.id)
+                for player in PlayerDb.query.filter(
+                    ~PlayerDb.id.in_(player_in_tournament_ids),
+                    PlayerDb.is_active
+                ).order_by(PlayerDb.id)
             ]
 
     def get_by_name(self, name: str) -> Optional[Player]:
