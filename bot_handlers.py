@@ -6,7 +6,7 @@ from telebot import types
 from database.database import db
 from decorators.validation_decorator import validate_user
 from enums.telegram_user_state import TelegramUserState
-from static.sticker_ids import StickerIds
+from services.static.sticker_ids import StickerIds
 from models.single_match_telegram_statistic import MatchResult
 from services.common.telegram_user_manager import TelegramUserManager
 from services.common.tournament_manager import TournamentManager

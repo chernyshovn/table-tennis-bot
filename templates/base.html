@@ -6,13 +6,21 @@
         <title>{% block title %} Статистика {% endblock %}</title>
         {% block head %}
             <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         {% endblock %}
+        <style>
+            nav li a {
+                color: white !important;
+            }
+        </style>
         {% block style %}{% endblock %}
     </head>
     <body>
          <nav class="navbar navbar-dark navbar-expand-md" style="background-color: #459fbf;">
-            <a class="navbar-brand" href="{{ url_for('statistics') }}">Статистика</a>
+            <a class="navbar-brand" href="{{ url_for('statistics') }}">
+                <img src="{{ url_for('static', filename='rackets_icon.png') }}" style="padding:0;" />
+                Статистика
+                <img src="{{ url_for('static', filename='rackets_icon.png') }}" style="padding:0;" />
+            </a>
             {% block nav %}
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nb" aria-controls="nb" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
