@@ -10,8 +10,7 @@ class DatetimeUtils:
         return value.strftime('%d.%m.%Y %H:%M')
 
     @staticmethod
-    def to_hhmm_diff(value1: datetime, value2: datetime) -> str:
-        delta = abs(value1 - value2)
+    def to_hhmm_diff(delta: timedelta) -> str:
         seconds = int(delta.total_seconds())
         hours = seconds // 3600
         minutes = (seconds // 60) - (hours * 60)

@@ -66,7 +66,7 @@ class SingleMatchTelegramStatisticProvider:
             tg_text += f'{DatetimeUtils.to_ddmmyyyy_hhmm(statistic.start_date_time, self.__time_shift)} - ' \
                     f'{DatetimeUtils.to_ddmmyyyy_hhmm(statistic.end_date_time, self.__time_shift)}\n\n'
 
-            tg_text += f'<b>Продолжительность:</b> {DatetimeUtils.to_hhmm_diff(statistic.end_date_time, statistic.start_date_time)}\n\n'
+            tg_text += f'<b>Продолжительность:</b> {DatetimeUtils.to_hhmm_diff(statistic.end_date_time - statistic.start_date_time)}\n\n'
 
             tg_text += '<b>Счет по геймам:</b>\n'
             tg_text += f'{player_1.name} {statistic.player_1_game_won_count} - {statistic.player_2_game_won_count} {player_2.name}\n\n'

@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 import flask
 from flask import redirect
 from flask_simplelogin import SimpleLogin, login_required, url_for
@@ -6,6 +7,7 @@ from telebot import types
 from app import app
 from bot_handlers import bot
 from database.database import db
+from templates.data_providers.match_statistics_provider import MatchStatisticsProvider
 import config
 
 app.config['SECRET_KEY'] = config.APP_SECRET
@@ -18,6 +20,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_CONNECTION_STRING
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+match_statistics_provider = MatchStatisticsProvider(date_time_shift=timedelta(hours=3))
 
 
 @app.route('/' + config.TELEGRAM_BOT_TOKEN, methods=['POST'])
@@ -43,7 +47,8 @@ def statistics():
 @app.route('/statistics/all-matches', methods=['GET'])
 @login_required
 def statistics_all_matches():
-    return flask.render_template('all_matches.html')
+    matches = match_statistics_provider.list()
+    return flask.render_template('all_matches.html', matches=matches)
 
 
 @app.route('/statistics/comparison', methods=['GET'])

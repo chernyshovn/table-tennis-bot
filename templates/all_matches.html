@@ -1,7 +1,61 @@
 {% extends 'base.html' %}
 {% block title %}Все матчи{% endblock %}
 
+{% block style %}
+<style>
+    .header {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    td, th {
+        white-space: nowrap;
+    }
+    .win {
+        background-color: rgb(222, 255, 240);
+    }
+    .loss {
+        background-color: rgb(255, 224, 222);
+    }
+    .draw {
+        background-color: rbg(250, 241, 215);
+    }
+</style>
+{% endblock %}
+
 {% block page_body %}
-<h4>Все матчи</h4>
-TODO
+<h3 class="header">Все матчи</h3>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Игрок 1</th>
+                <th scope="col">Игрок 2</th>
+                <th scope="col">Геймы</th>
+                <th scope="col">Очки</th>
+                <th scope="col">Локация</th>
+                <th scope="col">Дата</th>
+                <th scope="col">Длительность</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in matches %}
+            <tr>
+                <td scope="row">{{loop.index}}</td>
+                <td class="{{ 'win' if match.player_1_info.game_won_count > match.player_2_info.game_won_count else 'loss' if match.player_1_info.game_won_count < match.player_2_info.game_won_count else 'draw' }}">
+                    <b>{{ match.player_1_info.name }}</b>
+                </td>
+                <td class="{{ 'win' if match.player_1_info.game_won_count < match.player_2_info.game_won_count else 'loss' if match.player_1_info.game_won_count > match.player_2_info.game_won_count else 'draw' }}">
+                    <b>{{ match.player_2_info.name }}</b>
+                </td>
+                <td>{{ match.player_1_info.game_won_count }} &ndash; {{ match.player_2_info.game_won_count }}</td>
+                <td>{{ match.player_1_info.point_won_count }} &ndash; {{ match.player_2_info.point_won_count }}</td>
+                <td>{{ match.location_name }}</td>
+                <td>{{ match.start_date_time.strftime('%d.%m.%Y') }}</td>
+                <td>{{ match.duration_as_str }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
