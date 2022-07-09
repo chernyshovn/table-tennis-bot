@@ -89,3 +89,23 @@ class TelegramUser(db.Model):
     description = db.Column(db.String(100), nullable=True)
     has_access = db.Column(db.Boolean, nullable=False)
     subscribed_to_all_notifications = db.Column(db.Boolean, nullable=False)
+
+
+class SingleMatchStatistic(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
+    tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.id'), nullable=False)
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    start_date_time = db.Column(db.DateTime, nullable=False)
+    end_date_time = db.Column(db.DateTime, nullable=False)
+    player_1_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
+    player_2_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
+    player_1_game_won_count = db.Column(db.Integer, nullable=False)
+    player_2_game_won_count = db.Column(db.Integer, nullable=False)
+    player_1_point_won_count = db.Column(db.Integer, nullable=False)
+    player_2_point_won_count = db.Column(db.Integer, nullable=False)
+
+    player_1 = db.relationship('Player', foreign_keys=[player_1_id], lazy='subquery')
+    player_2 = db.relationship('Player', foreign_keys=[player_2_id], lazy='subquery')
+    location = db.relationship('Location', lazy='subquery')
+

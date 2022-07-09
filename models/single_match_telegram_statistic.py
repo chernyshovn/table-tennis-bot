@@ -8,7 +8,7 @@ class MatchResult(enum.Enum):
     DRAW = 2
 
 
-class MatchStatistic:
+class SingleMatchTelegramStatistic:
     def __init__(self,
                  result: MatchResult,
                  player_1_telegram_id: Optional[int],

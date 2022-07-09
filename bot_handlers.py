@@ -7,7 +7,7 @@ from database.database import db
 from decorators.validation_decorator import validate_user
 from enums.telegram_user_state import TelegramUserState
 from static.sticker_ids import StickerIds
-from models.match_statistic import MatchResult
+from models.single_match_telegram_statistic import MatchResult
 from services.common.telegram_user_manager import TelegramUserManager
 from services.common.tournament_manager import TournamentManager
 from services.common.location_manager import LocationManager
@@ -18,7 +18,7 @@ from services.single_match.single_match_player_adder import SingleMatchPlayerAdd
 from services.single_match.single_match_match_manager import SingleMatchMatchManager
 from services.single_match.single_match_player_names_provider import SingleMatchPlayerNameProvider
 from services.single_match.single_match_game_adder import SingleMatchGameAdder
-from services.single_match.single_match_statistic_provider import SingleMatchStatisticProvider
+from services.single_match.single_match_telegram_statistic_provider import SingleMatchTelegramStatisticProvider
 
 
 telegram_user_manager = TelegramUserManager()
@@ -31,7 +31,7 @@ single_match_player_adder = SingleMatchPlayerAdder(db)
 single_match_game_adder = SingleMatchGameAdder(db)
 single_match_match_manager = SingleMatchMatchManager(db)
 single_match_player_names_provider = SingleMatchPlayerNameProvider(db)
-single_match_statistic_provider = SingleMatchStatisticProvider(db, timedelta(hours=3))
+single_match_telegram_statistic_provider = SingleMatchTelegramStatisticProvider(db, timedelta(hours=3))
 
 
 @bot.message_handler(commands=['start'])
@@ -174,7 +174,7 @@ def handle_finish_match_command(message):
     if match_id:
         single_match_match_manager.finish_match(match_id)
 
-    match_statistic = single_match_statistic_provider.get(tournament_id)
+    match_statistic = single_match_telegram_statistic_provider.ensure_and_get(tournament_id)
 
     if match_statistic.is_no_games():
         tournament_manager.delete(tournament_id)
