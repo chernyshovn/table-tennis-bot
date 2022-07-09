@@ -1,5 +1,6 @@
 dnspython
 flask
+flask_simplelogin
 Flask-SQLAlchemy
 mysqlclient
 gunicorn
