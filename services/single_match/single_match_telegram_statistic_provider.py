@@ -1,7 +1,8 @@
 from datetime import timedelta
 from app import app
 from database.models import Tournament, SingleMatchStatistic
-from models.single_match_telegram_statistic import SingleMatchTelegramStatistic, MatchResult
+from enums.match_result import MatchResult
+from models.single_match_telegram_statistic import SingleMatchTelegramStatistic
 from utils.datetime_utils import DatetimeUtils
 
 
@@ -80,6 +81,8 @@ class SingleMatchTelegramStatisticProvider:
 
             return SingleMatchTelegramStatistic(
                 result=result,
+                player_1_id=player_1.id,
+                player_2_id=player_2.id,
                 player_1_telegram_id=player_1.telegram_id,
                 player_2_telegram_id=player_2.telegram_id,
                 player_1_games_won=statistic.player_1_game_won_count,

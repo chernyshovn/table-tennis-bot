@@ -6,8 +6,8 @@ from telebot import types
 from database.database import db
 from decorators.validation_decorator import validate_user
 from enums.telegram_user_state import TelegramUserState
+from enums.match_result import MatchResult
 from services.static.sticker_ids import StickerIds
-from models.single_match_telegram_statistic import MatchResult
 from services.common.telegram_user_manager import TelegramUserManager
 from services.common.tournament_manager import TournamentManager
 from services.common.location_manager import LocationManager
@@ -19,6 +19,7 @@ from services.single_match.single_match_match_manager import SingleMatchMatchMan
 from services.single_match.single_match_player_names_provider import SingleMatchPlayerNameProvider
 from services.single_match.single_match_game_adder import SingleMatchGameAdder
 from services.single_match.single_match_telegram_statistic_provider import SingleMatchTelegramStatisticProvider
+from services.single_match.single_match_elo_rate_manager import SingleMatchEloRateManager
 
 
 telegram_user_manager = TelegramUserManager()
@@ -32,6 +33,7 @@ single_match_game_adder = SingleMatchGameAdder(db)
 single_match_match_manager = SingleMatchMatchManager(db)
 single_match_player_names_provider = SingleMatchPlayerNameProvider(db)
 single_match_telegram_statistic_provider = SingleMatchTelegramStatisticProvider(db, timedelta(hours=3))
+single_match_elo_rate_manager = SingleMatchEloRateManager(db)
 
 
 @bot.message_handler(commands=['start'])
@@ -181,6 +183,13 @@ def handle_finish_match_command(message):
         bot.send_message(user_id, 'Вы не сыграли ни одного гейма!')
         bot.send_sticker(user_id, StickerIds.boor)
         return
+
+    single_match_elo_rate_manager.update(
+        player_1_id=match_statistic.player_1_id,
+        player_2_id=match_statistic.player_2_id,
+        match_id=match_id,
+        match_result=match_statistic.result
+    )
 
     chat_ids = {user_id, match_statistic.player_1_telegram_id, match_statistic.player_2_telegram_id}
     chat_ids.update(telegram_user_manager.list_subscribed_to_all_notifications())

@@ -109,3 +109,13 @@ class SingleMatchStatistic(db.Model):
     player_2 = db.relationship('Player', foreign_keys=[player_2_id], lazy='subquery')
     location = db.relationship('Location', lazy='subquery')
 
+
+class EloRateHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False, index=True)
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    value = db.Column(db.Integer, nullable=False)
+    datetime = db.Column(db.DateTime, nullable=False, index=True)
+
+    player = db.relationship('Player', lazy=True)
+    match = db.relationship('Match', lazy=True)
