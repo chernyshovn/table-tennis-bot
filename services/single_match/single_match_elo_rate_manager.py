@@ -2,14 +2,16 @@ from datetime import datetime
 from database.models import EloRateHistory, SingleMatchStatistic
 from models.single_match_elo_rate import SingleMatchEloRate
 from services.common.elo_rate_calculator import EloRateCalculator
+from services.common.player_manager import PlayerManager
 from app import app
 
 
 class SingleMatchEloRateManager:
     START_RATE = 1300
 
-    def __init__(self, db):
+    def __init__(self, db, player_manager: PlayerManager):
         self.__db = db
+        self.__player_manager = player_manager
 
     def __add_rate(self,
                    player_id: int,
@@ -72,3 +74,14 @@ class SingleMatchEloRateManager:
                     player_2_game_won_count=statistic.player_2_game_won_count,
                     date_time=statistic.end_date_time
                 )
+
+    def list(self) -> list[SingleMatchEloRate]:
+        with app.app_context():
+            rates = [
+                SingleMatchEloRate(
+                    player_name=player.name,
+                    value=self.get(player.id)
+                )
+                for player in self.__player_manager.list_all()
+            ]
+            return sorted(rates, key=lambda rate: rate.value, reverse=True)

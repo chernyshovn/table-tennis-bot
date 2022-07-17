@@ -33,7 +33,7 @@ single_match_game_adder = SingleMatchGameAdder(db)
 single_match_match_manager = SingleMatchMatchManager(db)
 single_match_player_names_provider = SingleMatchPlayerNameProvider(db)
 single_match_telegram_statistic_provider = SingleMatchTelegramStatisticProvider(db, timedelta(hours=3))
-single_match_elo_rate_manager = SingleMatchEloRateManager(db)
+single_match_elo_rate_manager = SingleMatchEloRateManager(db, player_manager)
 
 
 @bot.message_handler(commands=['start'])
@@ -234,7 +234,11 @@ def handle_finish_match_command(message):
 @bot.message_handler(commands=['elo_rating'])
 @validate_user
 def handle_elo_rating_command(message):
-    pass
+    rates = single_match_elo_rate_manager.list()
+    text = 'Текущий рейтинг Эло:\n\n'
+    for index, rate in enumerate(rates):
+        text += f'{index + 1}. {rate.value} - {rate.player_name}'
+    bot.send_message(message.chat.id, text)
 
 
 @bot.message_handler(func=lambda message: message.text.strip().startswith('-create-player'))
