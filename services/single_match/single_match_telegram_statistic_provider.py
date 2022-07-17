@@ -89,5 +89,7 @@ class SingleMatchTelegramStatisticProvider:
                 player_2_games_won=statistic.player_2_game_won_count,
                 player_1_points_won=statistic.player_1_point_won_count,
                 player_2_points_won=statistic.player_2_point_won_count,
+                start_date_time=statistic.start_date_time,
+                end_date_time=statistic.end_date_time,
                 description=tg_text
             )

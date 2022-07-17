@@ -1,6 +1,5 @@
 from datetime import datetime
-from enums.match_result import MatchResult
-from database.models import EloRateHistory
+from database.models import EloRateHistory, SingleMatchStatistic
 from models.single_match_elo_rate import SingleMatchEloRate
 from services.common.elo_rate_calculator import EloRateCalculator
 from app import app
@@ -15,13 +14,14 @@ class SingleMatchEloRateManager:
     def __add_rate(self,
                    player_id: int,
                    match_id: int,
-                   value: int):
+                   value: int,
+                   date_time: datetime):
         with app.app_context():
             entity = EloRateHistory(
                 player_id=player_id,
                 match_id=match_id,
                 value=value,
-                datetime=datetime.utcnow()
+                datetime=date_time
             )
             self.__db.session.add(entity)
             self.__db.session.commit()
@@ -38,6 +38,7 @@ class SingleMatchEloRateManager:
                player_2_id: int,
                player_1_game_won_count: int,
                player_2_game_won_count: int,
+               date_time: datetime
              ) -> tuple[int, int]:
         player_1_rate = self.get(player_1_id)
         player_2_rate = self.get(player_2_id)
@@ -50,7 +51,24 @@ class SingleMatchEloRateManager:
         )
 
         with app.app_context():
-            self.__add_rate(player_1_id, match_id, player_1_new_rate)
-            self.__add_rate(player_2_id, match_id, player_2_new_rate)
+            self.__add_rate(player_1_id, match_id, player_1_new_rate, date_time)
+            self.__add_rate(player_2_id, match_id, player_2_new_rate, date_time)
 
         return player_1_new_rate, player_2_new_rate
+
+    def recalculate_all(self):
+        with app.app_context():
+            self.__db.session.query(EloRateHistory).delete()
+            self.__db.session.commit()
+            self.__db.engine.execute("ALTER TABLE elo_rate_history AUTO_INCREMENT = 1;")
+
+            statistics = SingleMatchStatistic.query.order_by(SingleMatchStatistic.end_date_time).all()
+            for statistic in statistics:
+                self.update(
+                    match_id=statistic.match_id,
+                    player_1_id=statistic.player_1_id,
+                    player_2_id=statistic.player_2_id,
+                    player_1_game_won_count=statistic.player_1_game_won_count,
+                    player_2_game_won_count=statistic.player_2_game_won_count,
+                    date_time=statistic.end_date_time
+                )

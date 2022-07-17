@@ -189,7 +189,8 @@ def handle_finish_match_command(message):
         player_1_id=match_statistic.player_1_id,
         player_2_id=match_statistic.player_2_id,
         player_1_game_won_count=match_statistic.player_1_games_won,
-        player_2_game_won_count=match_statistic.player_2_games_won
+        player_2_game_won_count=match_statistic.player_2_games_won,
+        date_time=match_statistic.end_date_time
     )
 
     chat_ids = {user_id, match_statistic.player_1_telegram_id, match_statistic.player_2_telegram_id}
