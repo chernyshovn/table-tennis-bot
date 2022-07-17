@@ -237,7 +237,7 @@ def handle_elo_rating_command(message):
     rates = single_match_elo_rate_manager.list()
     text = 'Текущий рейтинг Эло:\n\n'
     for index, rate in enumerate(rates):
-        text += f'{index + 1}. {rate.value} - {rate.player_name}'
+        text += f'{index + 1}. {rate.value} - {rate.player_name}\n'
     bot.send_message(message.chat.id, text)
 
 
