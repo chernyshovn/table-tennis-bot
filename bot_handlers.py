@@ -185,10 +185,11 @@ def handle_finish_match_command(message):
         return
 
     single_match_elo_rate_manager.update(
+        match_id=match_id,
         player_1_id=match_statistic.player_1_id,
         player_2_id=match_statistic.player_2_id,
-        match_id=match_id,
-        match_result=match_statistic.result
+        player_1_game_won_count=match_statistic.player_1_games_won,
+        player_2_game_won_count=match_statistic.player_2_games_won
     )
 
     chat_ids = {user_id, match_statistic.player_1_telegram_id, match_statistic.player_2_telegram_id}
@@ -227,6 +228,12 @@ def handle_finish_match_command(message):
                         bot.send_sticker(chat_id, sticker_id)
             except:
                 pass
+
+
+@bot.message_handler(commands=['elo_rating'])
+@validate_user
+def handle_elo_rating_command(message):
+    pass
 
 
 @bot.message_handler(func=lambda message: message.text.strip().startswith('-create-player'))

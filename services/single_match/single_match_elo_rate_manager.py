@@ -1,6 +1,7 @@
 from datetime import datetime
 from enums.match_result import MatchResult
 from database.models import EloRateHistory
+from models.single_match_elo_rate import SingleMatchEloRate
 from services.common.elo_rate_calculator import EloRateCalculator
 from app import app
 
@@ -32,14 +33,21 @@ class SingleMatchEloRateManager:
             return rate.value if rate else SingleMatchEloRateManager.START_RATE
 
     def update(self,
+               match_id: int,
                player_1_id: int,
                player_2_id: int,
-               match_id: int,
-               match_result: MatchResult) -> tuple[int, int]:
+               player_1_game_won_count: int,
+               player_2_game_won_count: int,
+             ) -> tuple[int, int]:
         player_1_rate = self.get(player_1_id)
         player_2_rate = self.get(player_2_id)
 
-        player_1_new_rate, player_2_new_rate = EloRateCalculator.calculate(player_1_rate, player_2_rate, match_result)
+        player_1_new_rate, player_2_new_rate = EloRateCalculator.calculate(
+            player_1_rate,
+            player_2_rate,
+            player_1_game_won_count,
+            player_2_game_won_count
+        )
 
         with app.app_context():
             self.__add_rate(player_1_id, match_id, player_1_new_rate)
