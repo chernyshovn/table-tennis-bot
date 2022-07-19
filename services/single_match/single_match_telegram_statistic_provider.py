@@ -85,6 +85,8 @@ class SingleMatchTelegramStatisticProvider:
                 player_2_id=player_2.id,
                 player_1_telegram_id=player_1.telegram_id,
                 player_2_telegram_id=player_2.telegram_id,
+                player_1_name=player_1.name,
+                player_2_name=player_2.name,
                 player_1_games_won=statistic.player_1_game_won_count,
                 player_2_games_won=statistic.player_2_game_won_count,
                 player_1_points_won=statistic.player_1_point_won_count,

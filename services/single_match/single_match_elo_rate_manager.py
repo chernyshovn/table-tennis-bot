@@ -6,6 +6,18 @@ from services.common.player_manager import PlayerManager
 from app import app
 
 
+class SingleMatchEloRateUpdatingResult:
+    def __init__(self,
+                 player_1_old_rate: int,
+                 player_1_new_rate: int,
+                 player_2_old_rate: int,
+                 player_2_new_rate: int):
+        self.player_1_old_rate = player_1_old_rate
+        self.player_1_new_rate = player_1_new_rate
+        self.player_2_old_rate = player_2_old_rate
+        self.player_2_new_rate = player_2_new_rate
+
+
 class SingleMatchEloRateManager:
     START_RATE = 1300
 
@@ -40,14 +52,13 @@ class SingleMatchEloRateManager:
                player_2_id: int,
                player_1_game_won_count: int,
                player_2_game_won_count: int,
-               date_time: datetime
-             ) -> tuple[int, int]:
-        player_1_rate = self.get(player_1_id)
-        player_2_rate = self.get(player_2_id)
+               date_time: datetime) -> SingleMatchEloRateUpdatingResult:
+        player_1_old_rate = self.get(player_1_id)
+        player_2_old_rate = self.get(player_2_id)
 
         player_1_new_rate, player_2_new_rate = EloRateCalculator.calculate(
-            player_1_rate,
-            player_2_rate,
+            player_1_old_rate,
+            player_2_old_rate,
             player_1_game_won_count,
             player_2_game_won_count
         )
@@ -56,7 +67,12 @@ class SingleMatchEloRateManager:
             self.__add_rate(player_1_id, match_id, player_1_new_rate, date_time)
             self.__add_rate(player_2_id, match_id, player_2_new_rate, date_time)
 
-        return player_1_new_rate, player_2_new_rate
+        return SingleMatchEloRateUpdatingResult(
+            player_1_old_rate,
+            player_1_new_rate,
+            player_2_old_rate,
+            player_2_new_rate
+        )
 
     def recalculate_all(self):
         with app.app_context():

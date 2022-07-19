@@ -10,6 +10,8 @@ class SingleMatchTelegramStatistic:
                  player_2_id: int,
                  player_1_telegram_id: Optional[int],
                  player_2_telegram_id: Optional[int],
+                 player_1_name: str,
+                 player_2_name: str,
                  player_1_games_won: int,
                  player_2_games_won: int,
                  player_1_points_won: int,
@@ -20,6 +22,8 @@ class SingleMatchTelegramStatistic:
         self.result = result
         self.player_1_id = player_1_id
         self.player_2_id = player_2_id
+        self.player_1_name = player_1_name
+        self.player_2_name = player_2_name
         self.player_1_telegram_id = player_1_telegram_id
         self.player_2_telegram_id = player_2_telegram_id
         self.player_1_games_won = player_1_games_won

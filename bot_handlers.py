@@ -159,6 +159,11 @@ def process_add_player_callback(query):
     select_player(query.message, player_number + 1)
 
 
+def rate_change_to_string(player_name: str, old_value: int, new_value: int) -> str:
+    diff = new_value - old_value
+    return f'{player_name}: {old_value} → {new_value} ({diff:+})'
+
+
 @bot.message_handler(commands=['finish_match'])
 @validate_user
 def handle_finish_match_command(message):
@@ -184,7 +189,7 @@ def handle_finish_match_command(message):
         bot.send_sticker(user_id, StickerIds.boor)
         return
 
-    single_match_elo_rate_manager.update(
+    elo_rate_updating_result = single_match_elo_rate_manager.update(
         match_id=match_id,
         player_1_id=match_statistic.player_1_id,
         player_2_id=match_statistic.player_2_id,
@@ -192,6 +197,16 @@ def handle_finish_match_command(message):
         player_2_game_won_count=match_statistic.player_2_games_won,
         date_time=match_statistic.end_date_time
     )
+
+    rate_change_text = f'<b>Изменение рейтинга</b>\n\n' + rate_change_to_string(
+                           match_statistic.player_1_name,
+                           elo_rate_updating_result.player_1_old_rate,
+                           elo_rate_updating_result.player_1_new_rate
+                       ) + '\n' + rate_change_to_string(
+                           match_statistic.player_2_name,
+                           elo_rate_updating_result.player_2_old_rate,
+                           elo_rate_updating_result.player_2_new_rate
+                       )
 
     chat_ids = {user_id, match_statistic.player_1_telegram_id, match_statistic.player_2_telegram_id}
     chat_ids.update(telegram_user_manager.list_subscribed_to_all_notifications())
@@ -227,6 +242,8 @@ def handle_finish_match_command(message):
 
                     if sticker_id:
                         bot.send_sticker(chat_id, sticker_id)
+
+                bot.send_message(chat_id, rate_change_text, parse_mode='html')
             except:
                 pass
 
